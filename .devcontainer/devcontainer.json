@@ -13,7 +13,7 @@
 		"vscode": {
 			"extensions": [
 				"kreativ-software.csharpextensions",
-				"cweijan.vscode-mysql-client2"
+				"mongodb.mongodb-vscode"
 			]
 		}
 	}
