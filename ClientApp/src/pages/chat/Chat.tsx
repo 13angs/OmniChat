@@ -1,7 +1,9 @@
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import React, { useState, ChangeEvent, KeyboardEvent } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { User, Message } from '../../shared/types';
 import useSignalREffects from './useSignalREffects';
+import { useGetMessages, useGetUsers, useSignalRReceiveMessage, useSignalRSelectUser, useSignalRUserSelected } from './useChat';
+import api from '../../utils/api';
 
 interface ChatProps { }
 
@@ -13,101 +15,11 @@ const Chat: React.FC<ChatProps> = () => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   useSignalREffects({ setConnection });
-
-  useEffect(() => {
-    if (!connection) return;
-
-    // Start SignalR connection
-    connection.start().catch((err) => console.error('SignalR connection error:', err));
-
-    // Subscribe to ReceiveMessage event
-    connection.on('ReceiveMessage', (strMessage) => {
-      console.log(strMessage);
-      // Handle incoming message
-      const message: Message = JSON.parse(strMessage);
-
-      setMessages((prevMessages) => {
-        if (prevMessages.some((item) => item.timestamp === message.timestamp)) {
-          return prevMessages;
-        }
-        return [...prevMessages, message];
-      });
-    });
-
-    return () => {
-      // Stop SignalR connection when component unmounts
-      connection.stop();
-    };
-  }, [connection]);
-
-  useEffect(() => {
-    if (!connection || !selectedUser) return;
-
-    // Notify server when a user is selected
-    connection.invoke('SelectUser', selectedUser._id).catch((err) => console.error('Error invoking SelectUser:', err));
-    // eslint-disable-next-line
-  }, [connection]);
-
-  useEffect(() => {
-    if (!connection) return;
-
-    // Subscribe to UserSelected event
-    connection.on('UserSelected', (selectedUserId) => {
-      // Handle user selection in real-time
-      console.log(selectedUserId);
-      const selected = users.find((user) => user._id === selectedUserId);
-      if (selected) {
-        setSelectedUser(selected);
-      }
-    });
-
-    return () => {
-      // Unsubscribe from UserSelected event when component unmounts
-      connection.off('UserSelected');
-    };
-  }, [users, connection]);
-
-  useEffect(() => {
-    // Fetch users from the API
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('api/chat/users');
-        const data = await response.json();
-        setUsers(data);
-
-        // Set selectedUser based on user_id from the URL
-        const url = new URL(window.location.href);
-        const user_id = url.searchParams.get('user_id');
-        if (user_id) {
-          const selected = data.find((user: User) => user._id === user_id);
-          if (selected) {
-            setSelectedUser(selected);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (selectedUser) {
-      // Fetch messages from the API based on selectedUser
-      const fetchMessages = async () => {
-        try {
-          const response = await fetch(`api/chat/messages?user_id=${selectedUser._id}`);
-          const data = await response.json();
-          setMessages(data);
-        } catch (error) {
-          console.error('Error fetching messages:', error);
-        }
-      };
-
-      fetchMessages();
-    }
-  }, [selectedUser]);
+  useSignalRReceiveMessage({ connection, setMessages })
+  useSignalRSelectUser({ connection, selectedUser })
+  useSignalRUserSelected({ connection, users, setSelectedUser })
+  useGetUsers({ setUsers, setSelectedUser })
+  useGetMessages({ setMessages, selectedUser })
 
   const sendMessage = async (): Promise<void> => {
     if (newMessage.trim() === '' || !selectedUser || !connection) return;
@@ -119,19 +31,7 @@ const Chat: React.FC<ChatProps> = () => {
     };
 
     setNewMessage('');
-
-    // Send message to the API
-    try {
-      await fetch('api/chat/sendMessage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newMessageObj),
-      });
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
+    api.sendMessage(() => { }, (error) => { console.error('Error sending message:', error); }, newMessageObj)
   };
 
   const selectUser = (user: User): void => {

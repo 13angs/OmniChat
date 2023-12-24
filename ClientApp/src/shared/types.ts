@@ -10,3 +10,7 @@ export interface Message {
     text: string;
     timestamp: number;
 }
+
+export interface MessageParam {
+    user_id?: string;
+}

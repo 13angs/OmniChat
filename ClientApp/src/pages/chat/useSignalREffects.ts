@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
 // import { HttpTransportType } from '@microsoft/signalr';
-import websocket from '../../shared/websocket';
+import websocket from '../../utils/websocket';
 
 interface SignalREffectsProps {
   setConnection: React.Dispatch<React.SetStateAction<signalR.HubConnection | null>>;
