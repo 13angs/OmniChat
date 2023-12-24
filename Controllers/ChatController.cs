@@ -24,7 +24,7 @@ namespace OmniChat.Controllers
 
         public ChatController(IMongoClient mongoClient, IHubContext<ChatHub> chatHubContext, IConfiguration configuration)
         {
-            var database = mongoClient.GetDatabase("chat_db");
+            var database = mongoClient.GetDatabase("omni_db");
             _usersCollection = database.GetCollection<User>("users");
             _messagesCollection = database.GetCollection<Message>("messages");
             _chatHubContext = chatHubContext;

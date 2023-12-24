@@ -65,31 +65,34 @@ using (var scope = app.Services.CreateAsyncScope())
 {
     var mongoClient = scope.ServiceProvider.GetRequiredService<IMongoClient>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    var database = mongoClient.GetDatabase("chat_db");
+    var database = mongoClient.GetDatabase("omni_db");
     var usersCollection = database.GetCollection<User>("users");
-    var users = usersCollection.Find(_=>true);
+    var users = usersCollection.Find(_ => true).ToEnumerable();
 
-    if(!users.Any())
+    if (!users.Any())
     {
         logger.LogInformation("No user exist!\nAdding new users...");
-        await usersCollection.InsertManyAsync(new List<User>{
-            new User{
-                Id="c13cf23b-59c8-490d-8e8b-93c1988e203b",
-                Name="user 1",
-                Username="user1",
-                Avatar="https://cdn.dribbble.com/users/3841177/screenshots/11950347/cartoon-avatar_2020__8_circle.png",
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-            },
-            new User{
-                Id="29e7066b-0c42-48de-a835-1a103fd1dade",
-                Name="user 2",
-                Username="user2",
-                Avatar="https://www.gamer-hub.io/static/img/team/sam.png",
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-            },
-        });
+        users = UserGeneration.GenerateUserList(passwordHash, passwordSalt);
+
+        await usersCollection.InsertManyAsync(users);
+        // await usersCollection.InsertManyAsync(new List<User>{
+        //     new User{
+        //         Id="c13cf23b-59c8-490d-8e8b-93c1988e203b",
+        //         Name="user 1",
+        //         Username="user1",
+        //         Avatar="https://cdn.dribbble.com/users/3841177/screenshots/11950347/cartoon-avatar_2020__8_circle.png",
+        //         PasswordHash = passwordHash,
+        //         PasswordSalt = passwordSalt,
+        //     },
+        //     new User{
+        //         Id="29e7066b-0c42-48de-a835-1a103fd1dade",
+        //         Name="user 2",
+        //         Username="user2",
+        //         Avatar="https://www.gamer-hub.io/static/img/team/sam.png",
+        //         PasswordHash = passwordHash,
+        //         PasswordSalt = passwordSalt,
+        //     },
+        // });
     }
 }
 
@@ -123,5 +126,28 @@ public class PasswordHasher
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
+    }
+}
+
+public class UserGeneration
+{
+    public static List<User> GenerateUserList(byte[] passwordHash, byte[] passwordSalt)
+    {
+        var users = new List<User>();
+
+        for (int i = 1; i <= 50; i++)
+        {
+            users.Add(new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = $"user {i}",
+                Username = $"user{i}",
+                Avatar = $"https://example.com/avatar{i}.png",
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+            });
+        }
+
+        return users;
     }
 }
