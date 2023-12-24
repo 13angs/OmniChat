@@ -53,21 +53,27 @@ const Chat: React.FC<ChatProps> = () => {
 
   return (
     <div className="min-h-screen flex">
-      <div className="w-1/4 overflow-y-scroll p-4 border-r">
-        <h2 className="text-xl font-semibold mb-4">Users</h2>
-        <p className="mb-2">{selectedUser ? `Selected: ${selectedUser.name}` : 'No user selected'}</p>
-        <ul>
-          {users.map((user) => (
-            <li
-              key={user._id}
-              className={`cursor-pointer mb-2 p-2 rounded ${selectedUser?._id === user._id ? 'bg-blue-200' : 'bg-gray-200'
-                }`}
-              onClick={() => selectUser(user)}
-            >
-              {user.name}
-            </li>
-          ))}
-        </ul>
+      <div className="h-screen flex w-1/4 flex-col p-4 border-r">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Users</h2>
+          <p className="mb-2">
+            {selectedUser ? `Selected: ${selectedUser.name}` : 'No user selected'}
+          </p>
+        </div>
+        <div className="overflow-y-scroll">
+          <ul>
+            {users.map((user) => (
+              <li
+                key={user._id}
+                className={`cursor-pointer mb-2 p-2 rounded ${selectedUser?._id === user._id ? 'bg-blue-200' : 'bg-gray-200'
+                  }`}
+                onClick={() => selectUser(user)}
+              >
+                {user.name}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="flex-1 p-4" style={{ maxHeight: '100vh', overflowY: 'scroll', display: 'flex', flexDirection: 'column' }}>
         {selectedUser && (
