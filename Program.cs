@@ -135,19 +135,30 @@ public class UserGeneration
     {
         var users = new List<User>();
 
+        Random random = new Random();
+
         for (int i = 1; i <= 50; i++)
         {
+            string randomName = GenerateRandomString(random, 5); // You can specify the length you desire
+            string randomUsername = $"user-{randomName}"; // You can specify the length you desire
+
             users.Add(new User
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = $"user {i}",
-                Username = $"user{i}",
-                Avatar = $"https://example.com/avatar{i}.png",
+                Name = randomName,
+                Username = randomUsername,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
             });
         }
 
         return users;
+    }
+
+    private static string GenerateRandomString(Random random, int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyz";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 }

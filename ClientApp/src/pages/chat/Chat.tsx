@@ -74,14 +74,28 @@ const Chat: React.FC<ChatProps> = () => {
           <div className="border-b">
             <div className="w-12 h-12 rounded-full mb-2 overflow-hidden">
               {/* Use the Image component from next/image */}
-              <img
-                src={selectedUser.avatar}
-                alt={selectedUser.name}
-                // objectFit="cover"
-                className="w-12 h-12 rounded-full mb-2"
-                width={100}
-                height={100}
-              />
+              {selectedUser.avatar ? (
+                <img
+                  src={selectedUser.avatar}
+                  alt={selectedUser.name}
+                  className="w-12 h-12 rounded-full mb-2"
+                  width={100}
+                  height={100}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                    // If the image fails to load, display the fallback avatar
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null; // Reset the event to prevent infinite loop
+                    // Optionally, you can set a fallback image URL
+                    target.src = ''; // or provide a fallback image URL
+                  }}
+                />
+              ) : (
+                <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full mb-2">
+                  <p className="text-xl font-semibold text-gray-600">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </p>
+                </div>
+              )}
             </div>
             <p className="text-xl font-semibold">{selectedUser.name}</p>
           </div>
