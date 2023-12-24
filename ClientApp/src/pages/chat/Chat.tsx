@@ -1,40 +1,18 @@
-"use client"
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import * as signalR from '@microsoft/signalr';
-import { HttpTransportType } from '@microsoft/signalr';
+import { User, Message } from '../../shared/types';
+import useSignalREffects from './useSignalREffects';
 
-interface User {
-  _id: string;
-  name: string;
-  avatar: string;
-}
+interface ChatProps { }
 
-interface Message {
-  _id?: string;
-  user_id: string;
-  text: string;
-  timestamp: number;
-}
-
-const Chat: React.FC = () => {
+const Chat: React.FC<ChatProps> = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
-  useEffect(() => {
-    // Initialize SignalR connection
-    const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl('/hub/chat', {
-        skipNegotiation: true,
-        transport: HttpTransportType.WebSockets,
-        
-      })
-      .build();
-
-    setConnection(newConnection);
-  }, []);
+  useSignalREffects({ setConnection });
 
   useEffect(() => {
     if (!connection) return;
@@ -44,13 +22,15 @@ const Chat: React.FC = () => {
 
     // Subscribe to ReceiveMessage event
     connection.on('ReceiveMessage', (strMessage) => {
-        console.log(strMessage)
+      console.log(strMessage);
       // Handle incoming message
       const message: Message = JSON.parse(strMessage);
 
       setMessages((prevMessages) => {
-        if (prevMessages.some(item => item.timestamp === message.timestamp)) { return prevMessages }
-        return [...prevMessages, message]
+        if (prevMessages.some((item) => item.timestamp === message.timestamp)) {
+          return prevMessages;
+        }
+        return [...prevMessages, message];
       });
     });
 
@@ -64,10 +44,9 @@ const Chat: React.FC = () => {
     if (!connection || !selectedUser) return;
 
     // Notify server when a user is selected
-    connection.invoke('SelectUser', selectedUser._id)
-      .catch((err) => console.error('Error invoking SelectUser:', err));
-    // eslint-disable-next-line no-use-before-define
-  }, []);
+    connection.invoke('SelectUser', selectedUser._id).catch((err) => console.error('Error invoking SelectUser:', err));
+    // eslint-disable-next-line
+  }, [connection]);
 
   useEffect(() => {
     if (!connection) return;
@@ -75,7 +54,7 @@ const Chat: React.FC = () => {
     // Subscribe to UserSelected event
     connection.on('UserSelected', (selectedUserId) => {
       // Handle user selection in real-time
-      console.log(selectedUserId)
+      console.log(selectedUserId);
       const selected = users.find((user) => user._id === selectedUserId);
       if (selected) {
         setSelectedUser(selected);
@@ -90,10 +69,10 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     // Fetch users from the API
-
-    fetch('api/chat/users')
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('api/chat/users');
+        const data = await response.json();
         setUsers(data);
 
         // Set selectedUser based on user_id from the URL
@@ -105,21 +84,32 @@ const Chat: React.FC = () => {
             setSelectedUser(selected);
           }
         }
-      })
-      .catch((error) => console.error('Error fetching users:', error));
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   useEffect(() => {
     if (selectedUser) {
       // Fetch messages from the API based on selectedUser
-      fetch(`api/chat/messages?user_id=${selectedUser._id}`)
-        .then((response) => response.json())
-        .then((data) => setMessages(data))
-        .catch((error) => console.error('Error fetching messages:', error));
+      const fetchMessages = async () => {
+        try {
+          const response = await fetch(`api/chat/messages?user_id=${selectedUser._id}`);
+          const data = await response.json();
+          setMessages(data);
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+        }
+      };
+
+      fetchMessages();
     }
   }, [selectedUser]);
 
-  const sendMessage = (): void => {
+  const sendMessage = async (): Promise<void> => {
     if (newMessage.trim() === '' || !selectedUser || !connection) return;
 
     const newMessageObj: Message = {
@@ -131,14 +121,17 @@ const Chat: React.FC = () => {
     setNewMessage('');
 
     // Send message to the API
-    fetch('api/chat/sendMessage', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newMessageObj),
-    })
-      .catch((error) => console.error('Error sending message:', error));
+    try {
+      await fetch('api/chat/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMessageObj),
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   const selectUser = (user: User): void => {
@@ -150,9 +143,7 @@ const Chat: React.FC = () => {
     setSelectedUser(user);
   };
 
-  const filteredMessages = selectedUser
-    ? messages.filter((message) => message.user_id === selectedUser._id)
-    : [];
+  const filteredMessages = selectedUser ? messages.filter((message) => message.user_id === selectedUser._id) : [];
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
@@ -164,9 +155,7 @@ const Chat: React.FC = () => {
     <div className="min-h-screen flex">
       <div className="w-1/4 overflow-y-scroll p-4 border-r">
         <h2 className="text-xl font-semibold mb-4">Users</h2>
-        <p className="mb-2">
-          {selectedUser ? `Selected: ${selectedUser.name}` : 'No user selected'}
-        </p>
+        <p className="mb-2">{selectedUser ? `Selected: ${selectedUser.name}` : 'No user selected'}</p>
         <ul>
           {users.map((user) => (
             <li
@@ -210,15 +199,10 @@ const Chat: React.FC = () => {
             className="flex-1 border rounded p-2 mr-2"
             placeholder="Type a message..."
             value={newMessage}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setNewMessage(e.target.value)
-            }
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
           />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={sendMessage}
-          >
+          <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={sendMessage}>
             Send
           </button>
         </div>
