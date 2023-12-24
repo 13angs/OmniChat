@@ -15,14 +15,12 @@ spec:
     spec:
       containers:
         - name: {{ .Values.service.name }}
-          image: mongo:latest
+          image: 13angs/omni-chat:latest
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: {{ .Values.deployment.rootUsername }}
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: {{ .Values.deployment.rootPassword }}
+            - name: MongoSetting__ConnectionString
+              value: {{ .Values.deployment.mongoSettingConnectionString }}
 ---
 apiVersion: v1
 kind: Service

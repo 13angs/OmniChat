@@ -26,7 +26,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     // Initialize SignalR connection
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5078/hub/chat', {
+      .withUrl('/hub/chat', {
         skipNegotiation: true,
         transport: HttpTransportType.WebSockets,
         

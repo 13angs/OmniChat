@@ -1,5 +1,5 @@
 # values.yaml
-mongo:
+deployment:
   enabled: true
   rootUsername: "root"
   rootPassword: "password"
@@ -7,4 +7,3 @@ mongo:
 service:
   name: "chat-service"
   port: 27017
-  nodePort: 30017
