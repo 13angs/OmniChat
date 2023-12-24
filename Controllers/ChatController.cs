@@ -111,7 +111,7 @@ namespace OmniChat.Controllers
                 return user;
             }
 
-            return null;
+            throw new Exception($"ChatController.AuthenticateUserAsync: Failed authenticating {username}");
         }
 
         private bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
