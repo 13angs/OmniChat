@@ -63,6 +63,8 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.Configure<MongoConfig>(configuration.GetSection("MongoConfig"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IProviderRepository, ProviderRepository>();
+builder.Services.AddSingleton<IProviderService, ProviderService>();
 
 var app = builder.Build();
 

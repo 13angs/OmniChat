@@ -9,5 +9,6 @@ namespace OmniChat.Configurations
     public class MongoCollectionConfig
     {
         public string? UserCols { get; set; }
+        public string? ProviderCols { get; set; }
     }
 }
