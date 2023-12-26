@@ -13,7 +13,9 @@
 		"vscode": {
 			"extensions": [
 				"kreativ-software.csharpextensions",
-				"mongodb.mongodb-vscode"
+				"mongodb.mongodb-vscode",
+				"ms-dotnettools.csdevkit",
+				"SonarSource.sonarlint-vscode"
 			]
 		}
 	}

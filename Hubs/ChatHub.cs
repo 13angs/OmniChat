@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using OmniChat.Controllers;
+using OmniChat.Models;
 
 namespace OmniChat.Hubs
 {
