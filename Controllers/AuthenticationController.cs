@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using OmniChat.Hubs;
+using OmniChat.Configurations;
+using OmniChat.Interfaces;
 using OmniChat.Models;
 
 namespace OmniChat.Controllers
@@ -15,49 +13,35 @@ namespace OmniChat.Controllers
     public class AuthenticationController : Controller
     {
         private readonly IMongoCollection<User> _usersCollection;
-        private readonly IConfiguration _configuration;
-
-        public AuthenticationController(IMongoClient mongoClient, IHubContext<ChatHub> chatHubContext, IConfiguration configuration)
+        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
+        public AuthenticationController(IOptions<MongoConfig> mongoConfig, IMongoClient mongoClient, IUserService userService, IJwtService jwtService)
         {
-            var database = mongoClient.GetDatabase("omni_db");
-            _usersCollection = database.GetCollection<User>("users");
-            _configuration = configuration;
+            var database = mongoClient.GetDatabase(mongoConfig.Value.DbName);
+            _usersCollection = database.GetCollection<User>(mongoConfig.Value.Collections!.UserCols);
+            _userService = userService;
+            _jwtService = jwtService;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<string>> Register([FromBody]RegisterRequest registerRequest)
+        public async Task<ActionResult<string>> Register([FromBody] RegisterRequest registerRequest)
         {
-            // Check if the username is already taken
-            var existingUser = await _usersCollection.Find(u => u.Username == registerRequest.Username).FirstOrDefaultAsync();
-            if (existingUser != null)
+            try
             {
-                return BadRequest("Username already exists");
+                RegisterResponse response = await _userService.RegisterNewUserAsync(registerRequest);
+                return Ok(new OkResponse<RegisterResponse>
+                {
+                    Data = response
+                });
             }
-
-            // Create a new user
-            var newUser = new User
+            catch (Exception ex)
             {
-                ProviderId = string.Empty,
-                Username = registerRequest.Username,
-                FirstName = registerRequest.FirstName,
-                LastName = registerRequest.LastName,
-            };
-
-            Console.WriteLine(registerRequest.Password);
-
-            // Hash the password
-            PasswordHasher.CreatePasswordHash(registerRequest.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            newUser.PasswordHash = passwordHash;
-            newUser.PasswordSalt = passwordSalt;
-
-            // Insert the new user into the database
-            await _usersCollection.InsertOneAsync(newUser);
-
-            // Generate a JWT token for the newly registered user
-            var token = GenerateJwtToken(newUser);
-
-            return Ok(token);
+                return BadRequest(new ErrorResponse
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = ex.Message
+                });
+            }
         }
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login([FromBody] LoginRequest loginRequest)
@@ -68,7 +52,7 @@ namespace OmniChat.Controllers
                 return Unauthorized("Invalid username or password");
             }
 
-            var token = GenerateJwtToken(user);
+            var token = _jwtService.GenerateJwtToken(user);
             return Ok(token);
         }
 
@@ -96,37 +80,6 @@ namespace OmniChat.Controllers
                 }
             }
             return true;
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]!);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id),
-                    // Add additional claims if needed
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-    }
-
-    public static class PasswordHasher
-    {
-        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
         }
     }
 }

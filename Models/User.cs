@@ -57,6 +57,9 @@ namespace OmniChat.Models
         [JsonProperty("last_name")]
         public required string LastName { get; set; }
     }
-
-
+    public class RegisterResponse
+    {
+        [JsonProperty("token")]
+        public string? Token { get; set; }
+    }
 }

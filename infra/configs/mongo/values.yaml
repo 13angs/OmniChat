@@ -5,6 +5,6 @@ deployment:
   rootPassword: "password"
 
 service:
-  name: "chat-service"
+  name: "mongo-service"
   port: 27017
   nodePort: 30017

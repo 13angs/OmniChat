@@ -1,7 +1,7 @@
 # values.yaml
 deployment:
   enabled: true
-  mongoSettingConnectionString: "mongodb://root:password@chat-service.default.svc.cluster.local:27017/"
+  mongoSettingConnectionString: "mongodb://root:password@mongo-service.default.svc.cluster.local:27017/"
 
 service:
   name: "omni-service"

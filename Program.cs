@@ -8,7 +8,10 @@ using Newtonsoft.Json.Serialization;
 using OmniChat.Configurations;
 using OmniChat.Controllers;
 using OmniChat.Hubs;
+using OmniChat.Interfaces;
 using OmniChat.Models;
+using OmniChat.Repositories;
+using OmniChat.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +38,7 @@ builder.Services.AddControllersWithViews()
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         options.SerializerSettings.ContractResolver = new DefaultContractResolver();
     });
-builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(configuration["MongoSetting:ConnectionString"]));
+builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(configuration["MongoConfig:ConnectionString"]));
 builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>
 {
@@ -55,6 +58,11 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!))  // Replace with your secret key
     };
 });
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.Configure<MongoConfig>(configuration.GetSection("MongoConfig"));
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IUserService, UserService>();
 
 var app = builder.Build();
 
