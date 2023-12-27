@@ -60,6 +60,7 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<IProviderRepository, ProviderRepository>();
 builder.Services.AddSingleton<IProviderService, ProviderService>();
+builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddScoped<DataSeedingService>();
 
 var app = builder.Build();

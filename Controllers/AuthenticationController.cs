@@ -13,14 +13,14 @@ namespace OmniChat.Controllers
     public class AuthenticationController : Controller
     {
         private readonly IMongoCollection<User> _usersCollection;
-        private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
-        public AuthenticationController(IOptions<MongoConfig> mongoConfig, IMongoClient mongoClient, IUserService userService, IJwtService jwtService)
+        private readonly IAuthService _authService;
+        public AuthenticationController(IOptions<MongoConfig> mongoConfig, IMongoClient mongoClient, IJwtService jwtService, IAuthService authService)
         {
             var database = mongoClient.GetDatabase(mongoConfig.Value.DbName);
             _usersCollection = database.GetCollection<User>(mongoConfig.Value.Collections!.UserCols);
-            _userService = userService;
             _jwtService = jwtService;
+            _authService = authService;
         }
 
         [HttpPost("register")]
@@ -28,7 +28,7 @@ namespace OmniChat.Controllers
         {
             try
             {
-                RegisterResponse response = await _userService.RegisterNewUserAsync(registerRequest);
+                RegisterResponse response = await _authService.RegisterNewUserAsync(registerRequest);
                 return Ok(new OkResponse<RegisterResponse>
                 {
                     Data = response

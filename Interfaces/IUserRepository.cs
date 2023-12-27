@@ -6,6 +6,7 @@ namespace OmniChat.Interfaces
     {
         public Task InsertOneAsync(User user);
         public Task<User> FindByIdAsync(string id);
+        public Task<User> FindByUsernameAsync(string username);
         public Task UpdateProviderAsync(string userId, string providerId);
         public IEnumerable<User> FindAllUsers();
         public Task InsertManyAsync(List<User> users);

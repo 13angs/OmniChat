@@ -4,7 +4,6 @@ using MongoDB.Driver;
 using OmniChat.Configurations;
 using OmniChat.Interfaces;
 using OmniChat.Models;
-using OmniChat.Services;
 
 namespace OmniChat.Repositories
 {
@@ -32,6 +31,14 @@ namespace OmniChat.Repositories
             {
                 throw new DataException($"User with id {id} does not exist");
             }
+            return user;
+        }
+
+        public async Task<User> FindByUsernameAsync(string username)
+        {
+            User user = await _usersCollection
+                .Find(u => u.Username == username)
+                .FirstOrDefaultAsync();
             return user;
         }
 
