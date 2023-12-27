@@ -1,4 +1,5 @@
 using OmniChat.Interfaces;
+using OmniChat.Models;
 
 namespace OmniChat.Services
 {
@@ -9,6 +10,24 @@ namespace OmniChat.Services
         public UserService(IUserRepository userRepo)
         {
             _userRepo = userRepo;
+        }
+
+        public async Task<UserResponse> GetUsersAsync(UserRequest request)
+        {
+            if (!Enum.IsDefined(typeof(RequestParam), request.By))
+            {
+                throw new ArgumentNullException($"{request.By} not found");
+            }
+
+            UserResponse userResponse = new UserResponse();
+
+            if (request.By == RequestParam.provider_id && !string.IsNullOrEmpty(request.ProviderId))
+            {
+                userResponse.Users = await _userRepo.FindUsersByProviderId(request);
+                return userResponse;
+            }
+
+            throw new NotImplementedException($"By={request.By} is not implemented");
         }
     }
 }

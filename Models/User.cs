@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
@@ -50,7 +51,7 @@ namespace OmniChat.Models
 
         [JsonProperty("password")]
         public required string Password { get; set; }
-        
+
         [JsonProperty("first_name")]
         public required string FirstName { get; set; }
 
@@ -61,5 +62,22 @@ namespace OmniChat.Models
     {
         [JsonProperty("token")]
         public string? Token { get; set; }
+    }
+
+    public class UserResponse
+    {
+        public UserResponse()
+        {
+            Users = new List<User>();
+        }
+
+        [JsonProperty("users", NullValueHandling = NullValueHandling.Ignore)]
+        public List<User> Users { get; set; }
+    }
+
+    public class UserRequest : DefaultRequest
+    {
+        [FromQuery(Name = "provider_id")]
+        public string? ProviderId { get; set; }
     }
 }

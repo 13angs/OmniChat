@@ -10,5 +10,6 @@ namespace OmniChat.Interfaces
         public Task UpdateProviderAsync(string userId, string providerId);
         public IEnumerable<User> FindAllUsers();
         public Task InsertManyAsync(List<User> users);
+        public Task<List<User>> FindUsersByProviderId(UserRequest request);
     }
 }

@@ -42,6 +42,13 @@ namespace OmniChat.Repositories
             return user;
         }
 
+        public async Task<List<User>> FindUsersByProviderId(UserRequest request)
+        {
+
+            return await _usersCollection.Find(u => u.ProviderId == request.ProviderId)
+                .ToListAsync();
+        }
+
         public async Task InsertManyAsync(List<User> users)
         {
             await _usersCollection.InsertManyAsync(users);
