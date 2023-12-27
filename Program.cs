@@ -1,15 +1,11 @@
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Newtonsoft.Json.Serialization;
 using OmniChat.Configurations;
-using OmniChat.Controllers;
 using OmniChat.Hubs;
 using OmniChat.Interfaces;
-using OmniChat.Models;
 using OmniChat.Repositories;
 using OmniChat.Services;
 
@@ -58,38 +54,20 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!))  // Replace with your secret key
     };
 });
-builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.Configure<MongoConfig>(configuration.GetSection("MongoConfig"));
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<IProviderRepository, ProviderRepository>();
 builder.Services.AddSingleton<IProviderService, ProviderService>();
+builder.Services.AddScoped<DataSeedingService>();
 
 var app = builder.Build();
 
-// Inside your user creation logic
-// string password = "user_password"; // Replace with the actual user's password
-// byte[] passwordHash, passwordSalt;
-
-// PasswordHasher.CreatePasswordHash(password, out passwordHash, out passwordSalt);
-
-// using (var scope = app.Services.CreateScope())
-// {
-//     var mongoClient = scope.ServiceProvider.GetRequiredService<IMongoClient>();
-//     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-//     var database = mongoClient.GetDatabase("omni_db");
-//     var usersCollection = database.GetCollection<User>("users");
-//     var users = usersCollection.Find(_ => true).ToEnumerable();
-
-//     if (!users.Any())
-//     {
-//         logger.LogInformation("No user exist!\nAdding new users...");
-//         users = UserGeneration.GenerateUserList(passwordHash, passwordSalt);
-
-//         await usersCollection.InsertManyAsync(users);
-//     }
-// }
+// seeding users
+using var scope = app.Services.CreateAsyncScope();
+var dataSeedingService = scope.ServiceProvider.GetRequiredService<DataSeedingService>();
+await dataSeedingService.SeedUsersAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -110,37 +88,3 @@ app.MapControllerRoute(
 app.MapFallbackToFile("index.html");
 app.MapHub<ChatHub>("/hub/chat");
 app.Run();
-
-// public class UserGeneration
-// {
-//     public static List<User> GenerateUserList(byte[] passwordHash, byte[] passwordSalt)
-//     {
-//         var users = new List<User>();
-
-//         Random random = new Random();
-
-//         for (int i = 1; i <= 50; i++)
-//         {
-//             string randomName = GenerateRandomString(random, 5); // You can specify the length you desire
-//             string randomUsername = $"user-{randomName}"; // You can specify the length you desire
-
-//             users.Add(new User
-//             {
-//                 Id = Guid.NewGuid().ToString(),
-//                 Name = randomName,
-//                 Username = randomUsername,
-//                 PasswordHash = passwordHash,
-//                 PasswordSalt = passwordSalt,
-//             });
-//         }
-
-//         return users;
-//     }
-
-//     private static string GenerateRandomString(Random random, int length)
-//     {
-//         const string chars = "abcdefghijklmnopqrstuvwxyz";
-//         return new string(Enumerable.Repeat(chars, length)
-//           .Select(s => s[random.Next(s.Length)]).ToArray());
-//     }
-// }

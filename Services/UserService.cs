@@ -10,15 +10,13 @@ namespace OmniChat.Services
     public class UserService : IUserService
     {
         private readonly IMongoCollection<User> _usersCollection;
-        private readonly IPasswordService _pwdService;
         private readonly IJwtService _jwtService;
         private readonly IUserRepository _userRepo;
 
-        public UserService(IOptions<MongoConfig> mongoConfig, IMongoClient mongoClient, IPasswordService pwdService, IJwtService jwtService, IUserRepository userRepo)
+        public UserService(IOptions<MongoConfig> mongoConfig, IMongoClient mongoClient, IJwtService jwtService, IUserRepository userRepo)
         {
             var database = mongoClient.GetDatabase(mongoConfig.Value.DbName);
             _usersCollection = database.GetCollection<User>(mongoConfig.Value.Collections!.UserCols);
-            _pwdService = pwdService;
             _jwtService = jwtService;
             _userRepo = userRepo;
         }
@@ -42,7 +40,7 @@ namespace OmniChat.Services
             };
 
             // Hash the password
-            _pwdService.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            PasswordService.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             newUser.PasswordHash = passwordHash;
             newUser.PasswordSalt = passwordSalt;

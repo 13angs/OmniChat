@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using OmniChat.Configurations;
 using OmniChat.Interfaces;
 using OmniChat.Models;
+using OmniChat.Services;
 
 namespace OmniChat.Repositories
 {
@@ -14,6 +15,11 @@ namespace OmniChat.Repositories
         {
             var database = mongoClient.GetDatabase(mongoConfig.Value.DbName);
             _usersCollection = database.GetCollection<User>(mongoConfig.Value.Collections!.UserCols);
+        }
+
+        public IEnumerable<User> FindAllUsers()
+        {
+            return _usersCollection.Find(_ => true).ToEnumerable();
         }
 
         public async Task<User> FindByIdAsync(string id)
@@ -29,6 +35,11 @@ namespace OmniChat.Repositories
             return user;
         }
 
+        public async Task InsertManyAsync(List<User> users)
+        {
+            await _usersCollection.InsertManyAsync(users);
+        }
+
         public async Task InsertOneAsync(User user)
         {
             await _usersCollection.InsertOneAsync(user);
@@ -36,8 +47,8 @@ namespace OmniChat.Repositories
 
         public async Task UpdateProviderAsync(string userId, string providerId)
         {
-            var update = Builders<User>.Update.Set(u=>u.ProviderId, providerId);
-            await _usersCollection.UpdateOneAsync(x=> x.Id==userId, update);
+            var update = Builders<User>.Update.Set(u => u.ProviderId, providerId);
+            await _usersCollection.UpdateOneAsync(x => x.Id == userId, update);
         }
     }
 }
