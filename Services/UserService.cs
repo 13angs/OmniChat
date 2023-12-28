@@ -21,7 +21,7 @@ namespace OmniChat.Services
 
             UserResponse userResponse = new UserResponse();
 
-            if (request.By == RequestParam.provider_id && !string.IsNullOrEmpty(request.ProviderId))
+            if (request.By == RequestParam.provider && !string.IsNullOrEmpty(request.ProviderId))
             {
                 userResponse.Users = await _userRepo.FindUsersByProviderId(request);
                 return userResponse;

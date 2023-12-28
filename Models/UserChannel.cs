@@ -25,9 +25,9 @@ namespace OmniChat.Models
         [JsonProperty("channel_type")]
         public required ChannelType ChannelType { get; set; } // "user" or "group" or "platform"
         
-        [BsonElement("com_type")]
-        [JsonProperty("com_type")]
-        public required ComType ComType { get; set; }
+        [BsonElement("operation_mode")]
+        [JsonProperty("operation_mode")]
+        public required OperationMode OperationMode { get; set; }
         
         [BsonElement("manual_com")]
         [JsonProperty("manual_com")]

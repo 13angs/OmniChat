@@ -2,8 +2,10 @@ namespace OmniChat.Models
 {
     public enum RequestParam
     {
-        provider_id,
+        provider,
         platform,
-        channel_id
+        channel,
+        user,
+        friend
     }
 }
