@@ -6,37 +6,65 @@ namespace OmniChat.Services
     public class DataSeedingService
     {
         private readonly IUserRepository _userRepo;
-        private readonly ILogger<DataSeedingService> _logger;
-        public DataSeedingService(IUserRepository userRepo, ILogger<DataSeedingService> logger)
+        private readonly IProviderService _providerService;
+        public DataSeedingService(IUserRepository userRepo, IProviderService providerService)
         {
             _userRepo = userRepo;
-            _logger = logger;
+            _providerService = providerService;
         }
         public async Task SeedUsersAsync()
         {
-            int userCount = _userRepo.FindAllUsers().Count();
-
-            if (userCount == 2)
+            if (!_userRepo.FindAllUsers().Any())
             {
                 // do something here
                 byte[] passwordHash, passwordSalt;
                 string password = "P@ssw0rd";
-                string[] providers = new string[] { "89077392-cb69-4ebd-a638-0060c2cceeb2", "947c5424-5f2c-4172-900f-3f1a09b4d14e" };
+                IList<string> providers = new List<string>();
+
+                PasswordService.CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+                var adminUsers = new List<User>{
+                    new User
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ProviderId = string.Empty,
+                        FirstName = "don",
+                        LastName = "uma",
+                        Username = "don",
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
+                    },
+                    new User
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ProviderId = string.Empty,
+                        FirstName = "naya",
+                        LastName = "cn",
+                        Username = "naya",
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
+                    }
+                };
+
+                await _userRepo.InsertManyAsync(adminUsers);
+                
+                foreach (var user in adminUsers)
+                {
+                    var providerRequest = new CreateProviderRequest
+                    {
+                        Name = $"{user.FirstName} provider",
+                        OwnerId = user.Id
+                    };
+
+                    var provider = await _providerService.CreateProviderAsync(providerRequest);
+                    providers.Add(provider.Id);
+                }
 
                 foreach (string providerId in providers)
                 {
-                    PasswordService.CreatePasswordHash(password, out passwordHash, out passwordSalt);
                     var users = GenerateUserList(passwordHash, passwordSalt, providerId);
                     await _userRepo.InsertManyAsync(users);
                 }
-            }
-            else if (userCount > 2)
-            {
-                _logger.LogInformation("Users is greater than 2");
-            }
-            else if (userCount < 2)
-            {
-                _logger.LogInformation("Users is less than 2");
             }
         }
 

@@ -4,6 +4,6 @@ namespace OmniChat.Interfaces
 {
     public interface IProviderService
     {
-        public Task CreateProviderAsync(CreateProviderRequest request);
+        public Task<Provider> CreateProviderAsync(CreateProviderRequest request);
     }
 }

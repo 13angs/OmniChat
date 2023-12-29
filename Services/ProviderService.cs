@@ -15,7 +15,7 @@ namespace OmniChat.Services
             _userRepo = userRepo;
             _logger = logger;
         }
-        public async Task CreateProviderAsync(CreateProviderRequest request)
+        public async Task<Provider> CreateProviderAsync(CreateProviderRequest request)
         {
             try
             {
@@ -55,6 +55,7 @@ namespace OmniChat.Services
             await _providerRepo.InsertOneAsync(newProvider);
 
             await _userRepo.UpdateProviderAsync(request.OwnerId, newProvider.Id);
+            return newProvider;
         }
     }
 }
