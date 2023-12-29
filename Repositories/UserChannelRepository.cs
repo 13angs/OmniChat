@@ -17,7 +17,7 @@ namespace OmniChat.Repositories
         public async Task<UserChannel> FindRelatedUsersAsync(string from, string to)
         {
 
-            var filter = Builders<UserChannel>.Filter.ElemMatch(x => x.RelatedUsers, u => u.UserId == from && u.CurrentStatus == RelationshipStatus.follow) &
+            var filter = Builders<UserChannel>.Filter.ElemMatch(x => x.RelatedUsers, u => u.UserId == from) &
                      Builders<UserChannel>.Filter.ElemMatch(x => x.RelatedUsers, u => u.UserId == to);
 
             UserChannel userChannel = await _userChannelsCollection

@@ -6,5 +6,7 @@ namespace OmniChat.Interfaces
     {
         public Task<UserFriend> FindFollowedUserAsync(string from, string to);
         public Task InsertOneAsync(UserFriend userFriend);
+        public Task InsertManyAsync(List<UserFriend> friends);
+        public Task UpdateCurrentStatusAsync(UserFriend friend);
     }
 }

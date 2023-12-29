@@ -28,12 +28,21 @@ namespace OmniChat.Services
                 throw new ArgumentNullException(nameof(request), "to can not be null");
             }
 
+            bool friendExist = await _userChannelRepo
+                .FindRelatedUsersAsync(request.From.RefId!, request.To.UserId!) != null;
+
             UserFriend userFriend = await _userFriendRepo
                 .FindFollowedUserAsync(request.From.RefId!, request.To.UserId!);
 
-            if (userFriend != null)
+            if (friendExist && userFriend.CurrentStatus == RelationshipStatus.follow)
             {
                 throw new DataException("You already become friend");
+            }
+            else if (friendExist && (userFriend.CurrentStatus == RelationshipStatus.unfollow || userFriend.CurrentStatus == RelationshipStatus.blocked))
+            {
+                userFriend.CurrentStatus = RelationshipStatus.follow;
+                await _userFriendRepo.UpdateCurrentStatusAsync(userFriend);
+                return;
             }
 
             UserChannel userChannel = new UserChannel
@@ -47,36 +56,42 @@ namespace OmniChat.Services
                 To = request.To,
                 LatestMessage = string.Empty,
                 RelatedUsers = new List<RelatedUser>{
-                    new RelatedUser{ // for from
+                    new RelatedUser{
                         UserId=request.From.RefId!,
-                        IsRead=true,
-                        CurrentStatus=RelationshipStatus.follow
+                    },
+                    new RelatedUser{
+                        UserId=request.To.UserId!,
                     }
                 }
             };
-            userChannel.RelatedUsers.Add(new RelatedUser
-            { // for to
-                UserId = request.To.UserId!,
-                IsRead = false,
-                CurrentStatus = RelationshipStatus.unfollow
-            });
 
             await _userChannelRepo.InsertOneAsync(userChannel);
 
-            userFriend = new UserFriend
+            var friends = new List<UserFriend>
             {
-                ProviderId = request.ProviderId,
-                UserChannelId = userChannel.Id,
-                UserId = request.From.RefId!,
-                CurrentStatus = RelationshipStatus.follow,
-                RelatedUser = new RelatedUser
-                {
+                new UserFriend{ // from
+                    ProviderId = request.ProviderId,
+                    UserChannelId = userChannel.Id,
+                    UserId = request.From.RefId!,
+                    CurrentStatus = RelationshipStatus.follow,
+                    RelatedUser = new RelatedUser
+                    {
+                        UserId = request.To.UserId!
+                    }
+                },
+                new UserFriend{ // to
+                    ProviderId = request.ProviderId,
+                    UserChannelId = userChannel.Id,
                     UserId = request.To.UserId!,
                     CurrentStatus = RelationshipStatus.unfollow,
+                    RelatedUser = new RelatedUser
+                    {
+                        UserId = request.From.RefId!
+                    }
                 }
             };
 
-            await _userFriendRepo.InsertOneAsync(userFriend);
+            await _userFriendRepo.InsertManyAsync(friends);
         }
     }
 }
