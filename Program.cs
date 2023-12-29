@@ -62,6 +62,9 @@ builder.Services.AddSingleton<IProviderRepository, ProviderRepository>();
 builder.Services.AddSingleton<IProviderService, ProviderService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddScoped<DataSeedingService>();
+builder.Services.AddSingleton<IUserChannelRepository, UserChannelRepository>();
+builder.Services.AddSingleton<IUserFriendRepository, UserFriendRepository>();
+builder.Services.AddSingleton<UserChannelService>();
 
 var app = builder.Build();
 

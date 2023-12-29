@@ -21,7 +21,7 @@ namespace OmniChat.Services
                 // do something here
                 byte[] passwordHash, passwordSalt;
                 string password = "P@ssw0rd";
-                string[] providers = new string[] { "0087ca8e-6914-4839-8a4e-b616556d4425", "acac9094-c519-4f9e-9882-d82487672ae2" };
+                string[] providers = new string[] { "89077392-cb69-4ebd-a638-0060c2cceeb2", "947c5424-5f2c-4172-900f-3f1a09b4d14e" };
 
                 foreach (string providerId in providers)
                 {

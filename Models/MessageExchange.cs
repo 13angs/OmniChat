@@ -3,6 +3,9 @@ namespace OmniChat.Models
     public enum MessageExchange
     {
         push,
-        receive
+        receive,
+        follow,
+        unfollow,
+        blocked
     }
 }

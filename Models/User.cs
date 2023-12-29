@@ -80,4 +80,19 @@ namespace OmniChat.Models
         [FromQuery(Name = "provider_id")]
         public string? ProviderId { get; set; }
     }
+
+    public class RelatedUser
+    {
+        [JsonProperty("user_id")]
+        [BsonElement("user_id")]
+        public required string UserId { get; set; }
+        
+        [JsonProperty("is_read")]
+        [BsonElement("is_read")]
+        public bool IsRead { get; set; }
+        
+        [JsonProperty("current_status")]
+        [BsonElement("current_status")]
+        public RelationshipStatus CurrentStatus { get; set; }
+    }
 }

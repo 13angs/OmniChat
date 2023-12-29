@@ -31,43 +31,6 @@ namespace OmniChat.Models
         [BsonElement("message_object")]
         [JsonProperty("message_object")]
         public required object MessageObject { get; set; }
-        
-        [BsonElement("manual_com")]
-        [JsonProperty("manual_com")]
-        public required MessageManualCom ManualCom { get; set; }
-        
-        [BsonElement("auto_com")]
-        [JsonProperty("auto_com")]
-        public required MessageAutoCom AutoCom { get; set; }
-    }
-
-    public class MessageManualCom
-    {
-        [BsonElement("from")]
-        [JsonProperty("from")]
-        public required string From { get; set; }
-        
-        [BsonElement("from_name")]
-        [JsonProperty("from_name")]
-        public required string FromName { get; set; }
-        
-        [BsonElement("to")]
-        [JsonProperty("to")]
-        public required string To { get; set; }
-        
-        [BsonElement("to_name")]
-        [JsonProperty("to_name")]
-        public required string ToName { get; set; }
-    }
-    public class MessageAutoCom
-    {
-        [BsonElement("ma_type")]
-        [JsonProperty("ma_type")]
-        public required MaType MaType { get; set; }
-        
-        [BsonElement("ma_id")]
-        [JsonProperty("ma_id")]
-        public required string MaId { get; set; }
     }
 
     public class MessageRequest
@@ -84,4 +47,27 @@ namespace OmniChat.Models
         [FromQuery(Name = "user_id")]
         public string UserId { get; set; } = string.Empty;
     }
+
+    public class MessageFrom
+    {
+        [JsonProperty("ref_id")]
+        [BsonElement("ref_id")]
+        public string? RefId { get; set; }
+        
+        [JsonProperty("ref_name")]
+        [BsonElement("ref_name")]
+        public string? RefName { get; set; }
+    }
+    public class MessageTo
+    {
+        [JsonProperty("user_id")]
+        [BsonElement("user_id")]
+        public string? UserId { get; set; }
+        
+        [JsonProperty("name")]
+        [BsonElement("name")]
+        public string? Name { get; set; }
+    }
+
+
 }
