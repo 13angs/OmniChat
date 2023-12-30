@@ -29,6 +29,7 @@ namespace OmniChat.Services
             {
                 ProviderId = string.Empty,
                 Username = request.Username,
+                Name = request.Name,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
             };

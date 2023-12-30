@@ -22,6 +22,10 @@ namespace OmniChat.Models
         [JsonProperty("password_salt")]
         public byte[]? PasswordSalt { get; set; }
 
+        [BsonElement("name")]
+        [JsonProperty("name")]
+        public required string Name { get; set; }
+        
         [BsonElement("first_name")]
         [JsonProperty("first_name")]
         public required string FirstName { get; set; }
@@ -52,6 +56,9 @@ namespace OmniChat.Models
         [JsonProperty("password")]
         public required string Password { get; set; }
 
+        [JsonProperty("display_name")]
+        public required string Name { get; set; }
+        
         [JsonProperty("first_name")]
         public required string FirstName { get; set; }
 

@@ -28,6 +28,7 @@ namespace OmniChat.Services
                     {
                         Id = Guid.NewGuid().ToString(),
                         ProviderId = string.Empty,
+                        Name = "don",
                         FirstName = "don",
                         LastName = "uma",
                         Username = "don",
@@ -39,6 +40,7 @@ namespace OmniChat.Services
                         Id = Guid.NewGuid().ToString(),
                         ProviderId = string.Empty,
                         FirstName = "naya",
+                        Name = "naya",
                         LastName = "cn",
                         Username = "naya",
                         PasswordHash = passwordHash,
@@ -83,6 +85,7 @@ namespace OmniChat.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     ProviderId = providerId,
+                    Name = randomName,
                     FirstName = randomName,
                     LastName = randomName,
                     Username = randomUsername,

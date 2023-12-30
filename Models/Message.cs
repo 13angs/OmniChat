@@ -8,7 +8,7 @@ namespace OmniChat.Models
     {   
         [BsonElement("platform")]
         [JsonProperty("platform")]
-        public required string Platform { get; set; }
+        public required Platform Platform { get; set; }
         
         [BsonElement("provider_id")]
         [JsonProperty("provider_id")]
@@ -18,19 +18,29 @@ namespace OmniChat.Models
         [JsonProperty("channel_id")]
         public string? ChannelId { get; set; }
 
-        // if Platform is "line" type can be (platform)
-        // if Platform is "internal" type can be (user, group)
         [BsonElement("channel_type")]
         [JsonProperty("channel_type")]
         public required ChannelType ChannelType { get; set; }
         
-        [BsonElement("com_type")]
-        [JsonProperty("com_type")]
-        public required string ComType { get; set; }
+        [BsonElement("operation_mode")]
+        [JsonProperty("operation_mode")]
+        public required OperationMode OperationMode { get; set; }
+        
+        [BsonElement("message_exchange")]
+        [JsonProperty("message_exchange")]
+        public required MessageExchange MessageExchange { get; set; }
 
         [BsonElement("message_object")]
         [JsonProperty("message_object")]
         public required object MessageObject { get; set; }
+        
+        [BsonElement("from")]
+        [JsonProperty("from")]
+        public required MessageFrom From { get; set; }
+        
+        [BsonElement("user")]
+        [JsonProperty("user")]
+        public required MessageUser User { get; set; }
     }
 
     public class MessageRequest
@@ -54,11 +64,11 @@ namespace OmniChat.Models
         [BsonElement("ref_id")]
         public string? RefId { get; set; }
         
-        [JsonProperty("ref_name")]
-        [BsonElement("ref_name")]
-        public string? RefName { get; set; }
+        [JsonProperty("name")]
+        [BsonElement("name")]
+        public string? Name { get; set; }
     }
-    public class MessageTo
+    public class MessageUser
     {
         [JsonProperty("user_id")]
         [BsonElement("user_id")]

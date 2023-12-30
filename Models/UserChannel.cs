@@ -41,7 +41,7 @@ namespace OmniChat.Models
 
         [BsonElement("to")]
         [JsonProperty("to")]
-        public required MessageTo To { get; set; }
+        public required MessageUser To { get; set; }
 
         [BsonElement("latest_message")]
         [JsonProperty("latest_message")]
@@ -115,7 +115,7 @@ namespace OmniChat.Models
 
         [BsonElement("to")]
         [JsonProperty("to")]
-        public required MessageTo To { get; set; }
+        public required MessageUser To { get; set; }
     }
 
     public class UserChannelResponse
