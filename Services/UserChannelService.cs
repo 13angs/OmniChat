@@ -57,10 +57,10 @@ namespace OmniChat.Services
                 To = request.To,
                 LatestMessage = string.Empty,
                 RelatedUsers = new List<RelatedUser>{
-                    new RelatedUser{
+                    new RelatedUser{ // from
                         UserId=request.From.RefId!,
                     },
-                    new RelatedUser{
+                    new RelatedUser{ // to
                         UserId=request.To.UserId!,
                     }
                 }

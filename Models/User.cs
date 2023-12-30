@@ -86,5 +86,9 @@ namespace OmniChat.Models
         [JsonProperty("user_id")]
         [BsonElement("user_id")]
         public required string UserId { get; set; }
+        
+        [JsonProperty("is_read")]
+        [BsonElement("is_read")]
+        public bool IsRead { get; set; }
     }
 }
