@@ -12,5 +12,6 @@ namespace OmniChat.Configurations
         public string? ProviderCols { get; set; }
         public string? UserChannelCols { get; set; }
         public string? UserFriendCols { get; set; }
+        public string? MessageCols { get; set; }
     }
 }

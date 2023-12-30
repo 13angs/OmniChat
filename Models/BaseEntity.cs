@@ -7,7 +7,7 @@ namespace OmniChat.Models
     {
         public BaseEntity()
         {
-            var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             CreatedTimestamp = timestamp;
             ModifiedTimestamp = timestamp;
         }

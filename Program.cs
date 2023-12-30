@@ -65,6 +65,8 @@ builder.Services.AddSingleton<DataSeedingService>();
 builder.Services.AddSingleton<IUserChannelRepository, UserChannelRepository>();
 builder.Services.AddSingleton<IUserFriendRepository, UserFriendRepository>();
 builder.Services.AddSingleton<UserChannelService>();
+builder.Services.AddSingleton<MessageService>();
+builder.Services.AddSingleton<IMessageRepository, MessageRepository>();
 
 var app = builder.Build();
 

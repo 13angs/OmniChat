@@ -38,5 +38,12 @@ namespace OmniChat.Repositories
         {
             await _userChannelsCollection.InsertOneAsync(userChannel);
         }
+
+        public async Task ReplaceRelatedUsersAsync(UserChannel userChannel)
+        {
+            userChannel.ModifiedTimestamp=DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            await _userChannelsCollection
+                .ReplaceOneAsync(x=>x.Id==userChannel.Id, userChannel);
+        }
     }
 }
