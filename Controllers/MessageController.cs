@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OmniChat.Models;
 using OmniChat.Services;
 
@@ -18,6 +19,16 @@ namespace OmniChat.Controllers
         public MessageController(MessageService messageService)
         {
             _messageService = messageService;
+        }
+
+        [HttpGet]
+        [Route("messages")]
+        public ActionResult GetMessages([FromQuery] MessageRequest request)
+        {
+            return Ok(new OkResponse<MessageResponse>
+            {
+                Data = _messageService.GetMessages(request)
+            });
         }
 
         [HttpPost]

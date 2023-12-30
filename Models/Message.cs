@@ -44,9 +44,10 @@ namespace OmniChat.Models
         public required MessageUser User { get; set; }
     }
 
-    public class MessageRequest
+    public class MessageRequest : DefaultRequest
     {
         [JsonProperty("provider_id")]
+        [FromQuery(Name = "provider_id")]
         public required string ProviderId { get; set; }
         
         [BsonElement("platform")]
@@ -70,10 +71,12 @@ namespace OmniChat.Models
 
         [BsonElement("from")]
         [JsonProperty("from")]
+        [FromQuery(Name = "from")]
         public required MessageFrom From { get; set; }
 
         [BsonElement("to")]
         [JsonProperty("to")]
+        [FromQuery(Name = "to")]
         public required MessageUser To { get; set; }
     }
 
@@ -87,22 +90,35 @@ namespace OmniChat.Models
     {
         [JsonProperty("ref_id")]
         [BsonElement("ref_id")]
+        [FromQuery(Name = "ref_id")]
         public string? RefId { get; set; }
 
         [JsonProperty("name")]
         [BsonElement("name")]
+        [FromQuery(Name = "name")]
         public string? Name { get; set; }
     }
     public class MessageUser
     {
         [JsonProperty("user_id")]
         [BsonElement("user_id")]
+        [FromQuery(Name = "user_id")]
         public string? UserId { get; set; }
 
         [JsonProperty("name")]
         [BsonElement("name")]
+        [FromQuery(Name = "name")]
         public string? Name { get; set; }
     }
 
+    public class MessageResponse
+    {
+        public MessageResponse()
+        {
+            Messages=new List<Message>();
+        }
 
+        [JsonProperty("messages")]
+        public IEnumerable<Message> Messages { get; set; }
+    }
 }

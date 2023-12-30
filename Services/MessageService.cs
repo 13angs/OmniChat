@@ -62,5 +62,18 @@ namespace OmniChat.Services
                 await _messageRepo.InsertOneAsync(newMessage);
             }
         }
+    
+        public MessageResponse GetMessages(MessageRequest request)
+        {
+            // get messages for by=user
+            if(MessageHandler.HandleGetMessages(request))
+            {
+                return new MessageResponse{
+                    Messages=_messageRepo.FindMessagesByUserId(request)
+                };
+            }
+
+            throw new NotImplementedException("Query is not implemented");
+        }
     }
 }
