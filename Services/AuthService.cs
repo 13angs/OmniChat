@@ -14,7 +14,23 @@ namespace OmniChat.Services
             _jwtService = jwtService;
             _userRepo = userRepo;
         }
-        public async Task<RegisterResponse> RegisterNewUserAsync(RegisterRequest request)
+
+        public async Task<AuthResponse> LoginAsync(LoginRequest request)
+        {
+            var user = await AuthenticateUserAsync(request.Username, request.Password);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid username or password");
+            }
+
+            var token = _jwtService.GenerateJwtToken(user);
+            return new AuthResponse
+            {
+                Token = token
+            };
+        }
+
+        public async Task<AuthResponse> RegisterNewUserAsync(RegisterRequest request)
         {
             // Check if the username is already taken
             var existingUser = await _userRepo.FindByUsernameAsync(request.Username);
@@ -45,10 +61,22 @@ namespace OmniChat.Services
 
             // Generate a JWT token for the newly registered user
             var token = _jwtService.GenerateJwtToken(newUser);
-            return new RegisterResponse
+            return new AuthResponse
             {
                 Token = token
             };
+        }
+
+        private async Task<User> AuthenticateUserAsync(string username, string password)
+        {
+            var user = await _userRepo.FindByUsernameAsync(username);
+
+            if (user != null && PasswordService.VerifyPassword(password, user.PasswordHash!, user.PasswordSalt!))
+            {
+                return user;
+            }
+
+            throw new UnauthorizedAccessException($"AuthenticationController.AuthenticateUserAsync: Failed authenticating {username}");
         }
     }
 }
