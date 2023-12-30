@@ -1,10 +1,10 @@
-import { Message, MessageParam, User } from "../shared/types";
+import { Message, MessageParam, OkResponse, UserChannelResponse } from "../shared/types";
 
 // fetch users from the server
-async function getUsers(onSuccess: (users: User[]) => void, onError: (error: any) => void) {
+async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void) {
     try {
         // Fetch users from the 'api/chat/users' endpoint
-        const response = await fetch('api/chat/users');
+        const response = await fetch('api/v1/user/channels?by=provider&provider_id=18bc6926-1a47-40fd-88bd-26700fed67ac');
         const data = await response.json();
         // Call the onSuccess callback with the retrieved user data
         onSuccess(data);
@@ -48,7 +48,7 @@ async function sendMessage(onSuccess: () => void, onError: (error: any) => void,
 
 // Object containing utility functions for interacting with the server API
 const api = {
-    getUsers,
+    getUserChannels,
     getMessages,
     sendMessage
 }
