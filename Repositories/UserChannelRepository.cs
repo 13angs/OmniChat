@@ -14,6 +14,14 @@ namespace OmniChat.Repositories
             var database = mongoClient.GetDatabase(mongoConfig.Value.DbName);
             _userChannelsCollection = database.GetCollection<UserChannel>(mongoConfig.Value.Collections!.UserChannelCols);
         }
+
+        public async Task<List<UserChannel>> FindByProviderIdAsync(string providerId)
+        {
+            return await _userChannelsCollection
+                .Find(u => u.ProviderId == providerId)
+                .ToListAsync();
+        }
+
         public async Task<UserChannel> FindRelatedUsersAsync(string from, string to)
         {
 

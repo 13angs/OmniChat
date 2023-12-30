@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
@@ -86,7 +87,7 @@ namespace OmniChat.Models
         public string? Avatar { get; set; }
     }
 
-    public class UserChannelRequest
+    public class UserChannelRequest : DefaultRequest
     {
         [BsonElement("platform")]
         [JsonProperty("platform")]
@@ -94,6 +95,7 @@ namespace OmniChat.Models
 
         [BsonElement("provider_id")]
         [JsonProperty("provider_id")]
+        [FromQuery(Name = "provider_id")]
         public required string ProviderId { get; set; }
         [BsonElement("channel_type")]
         [JsonProperty("channel_type")]
@@ -114,5 +116,16 @@ namespace OmniChat.Models
         [BsonElement("to")]
         [JsonProperty("to")]
         public required MessageTo To { get; set; }
+    }
+
+    public class UserChannelResponse
+    {
+        public UserChannelResponse()
+        {
+            UserChannels=new List<UserChannel>();
+        }
+
+        [JsonProperty("user_channels")]
+        public List<UserChannel> UserChannels { get; set; }
     }
 }

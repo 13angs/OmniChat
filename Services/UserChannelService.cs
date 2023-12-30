@@ -1,4 +1,5 @@
 using System.Data;
+using OmniChat.Handlers;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -92,6 +93,20 @@ namespace OmniChat.Services
             };
 
             await _userFriendRepo.InsertManyAsync(friends);
+        }
+
+        public async Task<UserChannelResponse> GetUserChannelsAsync(UserChannelRequest request)
+        {
+            // If by=provider, get all user_channels by provider_id
+            if (UserChannelHandler.HandleGetUserChannels(request))
+            {
+                return new UserChannelResponse
+                {
+                    UserChannels = await _userChannelRepo.FindByProviderIdAsync(request.ProviderId)
+                };
+            }
+
+            throw new NotImplementedException($"by={request.By} is not implemented");
         }
     }
 }

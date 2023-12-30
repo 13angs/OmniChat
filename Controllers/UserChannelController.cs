@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using OmniChat.Models;
 using OmniChat.Services;
 
 namespace OmniChat.Controllers
 {
-    [Route("api/v1/user/channel")]
+    [Route("api/v1/user")]
     public class UserChannelController : Controller
     {
         private readonly UserChannelService _userChannelService;
@@ -19,8 +13,20 @@ namespace OmniChat.Controllers
             _userChannelService = userChannelService;
         }
 
+        [HttpGet]
+        [Route("channels")]
+        public async Task<ActionResult> GetUserChannelsAsync([FromQuery] UserChannelRequest request)
+        {
+            var response = await _userChannelService.GetUserChannelsAsync(request);
+
+            return Ok(new OkResponse<UserChannelResponse>
+            {
+                Data = response
+            });
+        }
+
         [HttpPost]
-        [Route("friend/add")]
+        [Route("channel/friend/add")]
         public async Task<ActionResult> AddFriend([FromBody] UserChannelRequest request)
         {
             await _userChannelService.AddFriendAsync(request);
