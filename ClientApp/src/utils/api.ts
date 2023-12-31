@@ -1,10 +1,10 @@
-import { Message, MessageParam, OkResponse, UserChannelResponse } from "../shared/types";
+import { Message, MessageResponse, OkResponse, UserChannelResponse } from "../shared/types";
 
 // fetch users from the server
 async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void) {
     try {
         // Fetch users from the 'api/chat/users' endpoint
-        const response = await fetch('api/v1/user/channels?by=provider&provider_id=18bc6926-1a47-40fd-88bd-26700fed67ac');
+        const response = await fetch('api/v1/user/channels?by=provider&provider_id=3012cdae-4f0c-48cf-8930-a2ca01115e5a');
         const data = await response.json();
         // Call the onSuccess callback with the retrieved user data
         onSuccess(data);
@@ -15,10 +15,10 @@ async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelR
 }
 
 // fetch messages for a specific user from the server
-async function getMessages(onSuccess: (messages: Message[]) => void, onError: (error: any) => void, params: MessageParam) {
+async function getMessages(onSuccess: (messages: OkResponse<MessageResponse>) => void, onError: (error: any) => void, params: Message) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await fetch(`api/chat/messages?user_id=${params.user_id}`);
+        const response = await fetch(`api/v1/messages?by=user&provider_id=${params?.provider_id}&from.ref_id=${params?.from?.ref_id}&to.user_id=${params?.to?.user_id}`);
         const data = await response.json();
         // Call the onSuccess callback with the retrieved message data
         onSuccess(data);

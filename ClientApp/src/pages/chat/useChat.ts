@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import api from "../../utils/api";
-import { Message, MessageParam, OkResponse, UserChannel, UserChannelResponse } from "../../shared/types";
+import { Message, MessageResponse, OkResponse, UserChannel, UserChannelResponse } from "../../shared/types";
 
 interface GetUsersProps {
     setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>;
@@ -43,7 +43,7 @@ const useSignalRReceiveMessage = ({ connection, setMessages }: ReceiveMessagePro
             const message: Message = JSON.parse(strMessage);
 
             setMessages((prevMessages) => {
-                if (prevMessages.some((item) => item.timestamp === message.timestamp)) {
+                if (prevMessages.some((item) => item.created_timestamp === message.created_timestamp)) {
                     return prevMessages;
                 }
                 return [...prevMessages, message];
@@ -103,9 +103,11 @@ const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUser
 
         // Set selectedUser based on user_id from the URL
         const url = new URL(window.location.href);
-        const user_id = url.searchParams.get('user_id');
-        if (user_id) {
-            const selected = response.data.user_channels.find((user: UserChannel) => user._id === user_id);
+        const user_id = url.searchParams.get('to.user_id');
+        const ref_id = url.searchParams.get('from.ref_id');
+
+        if (user_id && ref_id) {
+            const selected = response.data.user_channels.find((user: UserChannel) => user.to.user_id === user_id);
             if (selected) {
                 setSelectedUserChannel(selected);
             }
@@ -123,15 +125,18 @@ const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUser
 const useGetMessages = ({ setMessages, selectedUserChannel }: GetMessagesProps) => {
 
     // Function to handle successful message data retrieval
-    const handleGetMessagesSuccess = (data: Message[]): void => {
-        setMessages(data)
+    const handleGetMessagesSuccess = (response: OkResponse<MessageResponse>): void => {
+        console.log(response.data.messages)
+        setMessages(response.data.messages)
     }
 
     // fetch messages when the selectedUser changes
     useEffect(() => {
         if (selectedUserChannel) {
-            const params: MessageParam = {
-                user_id: selectedUserChannel?._id
+            const params: Message = {
+                provider_id: selectedUserChannel.provider_id,
+                from: selectedUserChannel.from,
+                to: selectedUserChannel.to
             }
             api.getMessages(handleGetMessagesSuccess, (error) => { console.error('Error fetching messages:', error); }, params)
         }

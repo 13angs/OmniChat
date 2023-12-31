@@ -23,25 +23,28 @@ interface RelatedUser {
     user_id: string;
     is_read: boolean;
 }
-interface MessageFrom{
-    ref_id: string;
-    name: string
+export interface MessageFrom{
+    ref_id?: string;
+    name?: string;
 }
-interface MessageTo{
-    user_id: string;
-    name: string
+export interface MessageTo{
+    user_id?: string;
+    name?: string
 }
-
 
 export interface Message {
     _id?: string;
-    user_id: string;
-    text: string;
-    timestamp: number;
-}
-
-export interface MessageParam {
-    user_id?: string;
+    created_timestamp?: number;
+    modified_timestamp?: number;
+    platform?: string; // Assuming this is an enum
+    provider_id?: string;
+    channel_id?: string;
+    channel_type?: string; // Assuming this is an enum
+    operation_mode?: string; // Assuming this is an enum
+    message_exchange?: string; // Assuming this is an enum
+    message_object?: any; 
+    from?: MessageFrom; // Assuming MessageFrom is a type defined below
+    to?: MessageTo;   // Assuming MessageUser is a type defined below
 }
 
 // responses
@@ -50,4 +53,7 @@ export interface OkResponse<T>{
 }
 export interface UserChannelResponse{
     user_channels: UserChannel[]
+}
+export interface MessageResponse{
+    messages: Message[]
 }

@@ -3,7 +3,6 @@ import * as signalR from '@microsoft/signalr';
 import { Message, UserChannel } from '../../shared/types';
 import useSignalREffects from './useSignalREffects';
 import { useGetMessages, useGetUserChannels, useSignalRReceiveMessage, useSignalRSelectUser, useSignalRUserChannelSelected } from './useChat';
-import api from '../../utils/api';
 
 interface ChatProps { }
 
@@ -18,34 +17,35 @@ const Chat: React.FC<ChatProps> = () => {
   useSignalRReceiveMessage({ connection, setMessages })
   useSignalRSelectUser({ connection, selectedUserChannel })
   useSignalRUserChannelSelected({ connection, userChannels, setSelectedUserChannel })
-  useGetUserChannels({ setUserChannels, setSelectedUserChannel  })
+  useGetUserChannels({ setUserChannels, setSelectedUserChannel })
   useGetMessages({ setMessages, selectedUserChannel })
 
   const sendMessage = async (): Promise<void> => {
     if (newMessage.trim() === '' || !selectedUserChannel || !connection) return;
 
-    const newMessageObj: Message = {
-      user_id: selectedUserChannel._id,
-      text: newMessage,
-      timestamp: Date.now(),
-    };
+    // const newMessageObj: Message = {
+    //   user_id: selectedUserChannel._id,
+    //   text: newMessage,
+    //   timestamp: Date.now(),
+    // };
 
     setNewMessage('');
-    api.sendMessage(() => { }, (error) => { console.error('Error sending message:', error); }, newMessageObj)
+    // api.sendMessage(() => { }, (error) => { console.error('Error sending message:', error); }, newMessageObj)
   };
 
   const selectUserChannel = (userChannel: UserChannel): void => {
     // Update the URL with the user_id
     const url = new URL(window.location.href);
-    url.searchParams.set('user_id', userChannel._id);
+    url.searchParams.set('from.ref_id', userChannel?.from?.ref_id ?? "");
+    url.searchParams.set('to.user_id', userChannel?.to?.user_id ?? "");
     window.history.pushState({}, '', url.toString());
 
     setSelectedUserChannel(userChannel);
   };
 
-  const filteredMessages = selectedUserChannel ? messages.filter((message) => message.user_id === selectedUserChannel._id) : [];
+  const filteredMessages = selectedUserChannel ? messages.filter((message) => message?.to?.user_id === selectedUserChannel.to.user_id) : [];
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       sendMessage();
     }
@@ -61,18 +61,16 @@ const Chat: React.FC<ChatProps> = () => {
           </p>
         </div>
         <div className="overflow-y-scroll">
-          <ul>
             {userChannels.map((userChannel) => (
-              <li
-                key={userChannel._id}
-                className={`cursor-pointer mb-2 p-2 rounded ${selectedUserChannel?._id === userChannel._id ? 'bg-blue-200' : 'bg-gray-200'
-                  }`}
+              <button
+                style={{width: '100%', textAlign: 'left'}}
+                key={`${userChannel._id}`}
+                className={`cursor-pointer mb-2 p-2 rounded ${selectedUserChannel?._id === userChannel._id ? 'bg-blue-200' : 'bg-gray-200'}`}
                 onClick={() => selectUserChannel(userChannel)}
               >
                 {userChannel.from.name}
-              </li>
+              </button>
             ))}
-          </ul>
         </div>
       </div>
       <div className="flex-1 p-4" style={{ maxHeight: '100vh', overflowY: 'scroll', display: 'flex', flexDirection: 'column' }}>
@@ -87,18 +85,11 @@ const Chat: React.FC<ChatProps> = () => {
                   className="w-12 h-12 rounded-full mb-2"
                   width={100}
                   height={100}
-                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                    // If the image fails to load, display the fallback avatar
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null; // Reset the event to prevent infinite loop
-                    // Optionally, you can set a fallback image URL
-                    target.src = ''; // or provide a fallback image URL
-                  }}
                 />
               ) : (
                 <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full mb-2">
                   <p className="text-xl font-semibold text-gray-600">
-                    {selectedUserChannel.from.name.charAt(0).toUpperCase()}
+                    {selectedUserChannel?.from?.name?.charAt(0).toUpperCase()}
                   </p>
                 </div>
               )}
@@ -107,10 +98,13 @@ const Chat: React.FC<ChatProps> = () => {
           </div>
         )}
         <div className="flex-1 overflow-y-scroll">
-          {filteredMessages.map((message, index) => (
-            <div key={index} className="mb-2 p-2 rounded bg-gray-200">
-              <p className="text-gray-800">{message.text}</p>
-            </div>
+          {filteredMessages.map((message) => (
+            <>{message.message_object?.map((messageObject: any) => (
+              <div key={`${messageObject?.text}`} className="mb-2 p-2 rounded bg-gray-200">
+                <p className="text-gray-800">{messageObject?.text}</p>
+              </div>
+            ))}
+            </>
           ))}
         </div>
         <div className="flex items-center">
@@ -120,7 +114,7 @@ const Chat: React.FC<ChatProps> = () => {
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
           />
           <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={sendMessage}>
             Send

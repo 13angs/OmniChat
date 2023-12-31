@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace OmniChat.Models
 {
@@ -39,8 +38,8 @@ namespace OmniChat.Models
         [JsonProperty("from")]
         public required MessageFrom From { get; set; }
 
-        [BsonElement("user")]
-        [JsonProperty("user")]
+        [BsonElement("to")]
+        [JsonProperty("to")]
         public required MessageUser User { get; set; }
     }
 
