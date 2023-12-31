@@ -1,4 +1,4 @@
-import { Message, MessageResponse, OkResponse, UserChannelResponse } from "../shared/types";
+import { AuthResponse, LoginRequest, Message, MessageResponse, OkResponse, UserChannelResponse } from "../shared/types";
 
 // fetch users from the server
 async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void) {
@@ -46,11 +46,32 @@ async function sendMessage(onSuccess: () => void, onError: (error: any) => void,
     }
 }
 
+// log the user in
+async function login(onSuccess: (authResponse: OkResponse<AuthResponse>) => void, onError: (error: any) => void, body: LoginRequest) {
+    try {
+        // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
+        const response = await fetch(`api/v1/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        const data = await response.json();
+        // Call the onSuccess callback with the retrieved message data
+        onSuccess(data);
+    } catch (error) {
+        // Call the onError callback in case of an error during message data retrieval
+        onError(error);
+    }
+}
+
 // Object containing utility functions for interacting with the server API
 const api = {
     getUserChannels,
     getMessages,
-    sendMessage
+    sendMessage,
+    login
 }
 
 export default api;

@@ -1,4 +1,5 @@
 import Chat from "./pages/chat/Chat";
+import Login from "./pages/login/login";
 
 const AppRoutes = [
   {
@@ -8,6 +9,10 @@ const AppRoutes = [
   {
     path: '/chat',
     element: <Chat />
+  },
+  {
+    path: '/login',
+    element: <Login />
   }
 ];
 

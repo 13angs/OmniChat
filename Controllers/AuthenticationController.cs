@@ -40,7 +40,7 @@ namespace OmniChat.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> LoginAsync([FromBody] LoginRequest loginRequest)
+        public async Task<ActionResult> LoginAsync([FromBody] LoginRequest loginRequest)
         {
 
             return Ok(new OkResponse<AuthResponse>

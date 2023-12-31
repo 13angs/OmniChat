@@ -57,3 +57,13 @@ export interface UserChannelResponse{
 export interface MessageResponse{
     messages: Message[]
 }
+export interface AuthResponse{
+    token: string
+}
+
+// request
+export interface LoginRequest
+{
+    username: string;
+    password: string;
+}
