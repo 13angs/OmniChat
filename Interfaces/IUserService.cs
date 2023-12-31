@@ -6,5 +6,6 @@ namespace OmniChat.Interfaces
     {
         public Task<UserResponse> GetUsersAsync(UserRequest request);
         public Task<UserResponse> GetMyProfileAsync(UserRequest request);
+        public Task<UserResponse> GetUserProfileAsync(UserRequest request);
     }
 }

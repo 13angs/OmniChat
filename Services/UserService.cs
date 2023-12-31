@@ -20,7 +20,23 @@ namespace OmniChat.Services
             if (UserHandler.HandleGetMyProfile(request))
             {
                 JwtPayloadData payloadData = _jwtService.DecodeJwtPayloadData(request.Token!);
-                User user = await _userRepo.FindByIdAsync(payloadData.UserId!) ?? 
+                User user = await _userRepo.FindByIdAsync(payloadData.UserId!) ??
+                    throw new BadHttpRequestException("User not found");
+
+                return new UserResponse
+                {
+                    User = user
+                };
+            }
+
+            throw new NotImplementedException("Action is not implemented");
+        }
+
+        public async Task<UserResponse> GetUserProfileAsync(UserRequest request)
+        {
+            if (UserHandler.HandleGetUserProfile(request))
+            {
+                User user = await _userRepo.FindByIdAsync(request.UserId!) ??
                     throw new BadHttpRequestException("User not found");
 
                 return new UserResponse

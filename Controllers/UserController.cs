@@ -44,5 +44,15 @@ namespace OmniChat.Controllers
                 Data = await _userService.GetMyProfileAsync(request)
             });
         }
+        
+        [HttpGet]
+        [Route("user/profile")]
+        public async Task<ActionResult> GetUserProfileAsync([FromQuery] UserRequest request)
+        {
+            return Ok(new OkResponse<UserResponse>
+            {
+                Data = await _userService.GetUserProfileAsync(request)
+            });
+        }
     }
 }
