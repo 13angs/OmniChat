@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -22,7 +23,7 @@ namespace OmniChat.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id),
+                    new Claim("user_id", user.Id),
                     // Add additional claims if needed
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
@@ -31,6 +32,15 @@ namespace OmniChat.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public JwtPayloadData DecodeJwtPayloadData(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            string strPayload = jwtToken.Payload.SerializeToJson();
+            return JsonConvert.DeserializeObject<JwtPayloadData>(strPayload)!;
         }
     }
 }

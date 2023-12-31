@@ -4,7 +4,7 @@ using OmniChat.Models;
 
 namespace OmniChat.Controllers
 {
-    [Route("api/v1/users")]
+    [Route("api/v1")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -15,6 +15,7 @@ namespace OmniChat.Controllers
         }
 
         [HttpGet]
+        [Route("users")]
         public async Task<ActionResult> GetUsers([FromQuery] UserRequest request)
         {
             try
@@ -32,6 +33,16 @@ namespace OmniChat.Controllers
                     Message = ex.Message
                 });
             }
+        }
+
+        [HttpPost]
+        [Route("user/me")]
+        public async Task<ActionResult> GetMyProfileAsync([FromBody] UserRequest request)
+        {
+            return Ok(new OkResponse<UserResponse>
+            {
+                Data = await _userService.GetMyProfileAsync(request)
+            });
         }
     }
 }

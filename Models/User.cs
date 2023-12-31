@@ -17,10 +17,12 @@ namespace OmniChat.Models
 
         [BsonElement("password_hash")]
         [JsonProperty("password_hash")]
+        [JsonIgnore]
         public byte[]? PasswordHash { get; set; }
 
         [BsonElement("password_salt")]
         [JsonProperty("password_salt")]
+        [JsonIgnore]
         public byte[]? PasswordSalt { get; set; }
 
         [BsonElement("name")]
@@ -70,19 +72,21 @@ namespace OmniChat.Models
 
     public class UserResponse
     {
-        public UserResponse()
-        {
-            Users = new List<User>();
-        }
-
         [JsonProperty("users", NullValueHandling = NullValueHandling.Ignore)]
-        public List<User> Users { get; set; }
+        public List<User>? Users { get; set; }
+        
+        [JsonProperty("user", NullValueHandling = NullValueHandling.Ignore)]
+        public User? User { get; set; }
     }
 
     public class UserRequest : DefaultRequest
     {
         [FromQuery(Name = "provider_id")]
         public string? ProviderId { get; set; }
+        
+        [JsonProperty("token")]
+        [FromQuery(Name = "token")]
+        public string? Token { get; set; }
     }
 
     public class RelatedUser

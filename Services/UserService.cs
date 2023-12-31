@@ -1,3 +1,4 @@
+using OmniChat.Handlers;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -6,10 +7,29 @@ namespace OmniChat.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepo;
+        private readonly IJwtService _jwtService;
 
-        public UserService(IUserRepository userRepo)
+        public UserService(IUserRepository userRepo, IJwtService jwtService)
         {
             _userRepo = userRepo;
+            _jwtService = jwtService;
+        }
+
+        public async Task<UserResponse> GetMyProfileAsync(UserRequest request)
+        {
+            if (UserHandler.HandleGetMyProfile(request))
+            {
+                JwtPayloadData payloadData = _jwtService.DecodeJwtPayloadData(request.Token!);
+                User user = await _userRepo.FindByIdAsync(payloadData.UserId!) ?? 
+                    throw new BadHttpRequestException("User not found");
+
+                return new UserResponse
+                {
+                    User = user
+                };
+            }
+
+            throw new NotImplementedException("Action is not implemented");
         }
 
         public async Task<UserResponse> GetUsersAsync(UserRequest request)
