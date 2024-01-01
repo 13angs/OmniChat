@@ -1,4 +1,5 @@
 using System.Data;
+using OmniChat.Handlers;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -17,17 +18,17 @@ namespace OmniChat.Services
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var user = await AuthenticateUserAsync(request.Username, request.Password);
-            if (user == null)
+            if (AuthHandler.HandleLogin(request))
             {
-                throw new UnauthorizedAccessException("Invalid username or password");
+                var user = await AuthenticateUserAsync(request.Username, request.Password);
+                var token = _jwtService.GenerateJwtToken(user);
+                return new AuthResponse
+                {
+                    Token = token
+                };
             }
 
-            var token = _jwtService.GenerateJwtToken(user);
-            return new AuthResponse
-            {
-                Token = token
-            };
+            throw new BadHttpRequestException("Username and password can not be null!");
         }
 
         public async Task<AuthResponse> RegisterNewUserAsync(RegisterRequest request)
@@ -76,7 +77,7 @@ namespace OmniChat.Services
                 return user;
             }
 
-            throw new UnauthorizedAccessException($"AuthenticationController.AuthenticateUserAsync: Failed authenticating {username}");
+            throw new UnauthorizedAccessException($"Invalid username or password");
         }
     }
 }
