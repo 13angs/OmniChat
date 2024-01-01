@@ -2,6 +2,7 @@ using System.Data;
 using OmniChat.Handlers;
 using OmniChat.Interfaces;
 using OmniChat.Models;
+using Serilog;
 
 namespace OmniChat.Services
 {
@@ -20,12 +21,19 @@ namespace OmniChat.Services
         {
             if (AuthHandler.HandleLogin(request))
             {
-                var user = await AuthenticateUserAsync(request.Username, request.Password);
-                var token = _jwtService.GenerateJwtToken(user);
-                return new AuthResponse
+                try
                 {
-                    Token = token
-                };
+                    var user = await AuthenticateUserAsync(request.Username, request.Password);
+                    var token = _jwtService.GenerateJwtToken(user);
+                    return new AuthResponse
+                    {
+                        Token = token
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, ex.Message);
+                }
             }
 
             throw new BadHttpRequestException("Username and password can not be null!");

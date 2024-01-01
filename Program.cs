@@ -8,14 +8,24 @@ using OmniChat.Hubs;
 using OmniChat.Interfaces;
 using OmniChat.Repositories;
 using OmniChat.Services;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 var configuration = builder.Configuration;
-// Add services to the container.
 
+Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .WriteTo.File(Path.Combine(builder.Environment.ContentRootPath, "Logs/log.txt"), 
+                rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+builder.Host.UseSerilog(); 
+// Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -89,3 +99,5 @@ app.MapControllerRoute(
 app.MapFallbackToFile("index.html");
 app.MapHub<ChatHub>("/hub/chat");
 app.Run();
+
+Log.CloseAndFlush();
