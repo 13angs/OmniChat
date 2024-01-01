@@ -2,6 +2,7 @@ using System.Data;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using OmniChat.Configurations;
+using OmniChat.Exceptions;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -29,7 +30,7 @@ namespace OmniChat.Repositories
 
             if (user == null)
             {
-                throw new DataException($"User with id {id} does not exist");
+                throw new NotFoundException($"User with id {id} does not exist");
             }
             return user;
         }

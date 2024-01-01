@@ -33,6 +33,9 @@ backupDir="/backup/$timestamp"
 
 # Check if the MongoDB pod is running
 if kubectl get pods $pod_name &> /dev/null; then
+    # create the backup dir if not exist
+    kubectl exec $pod_name -- mkdir -p /backup
+    
     # Create backup
     kubectl exec $pod_name -- mongodump --port $port --username $username --password $password --out $backupDir --verbose
 

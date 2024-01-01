@@ -1,4 +1,4 @@
-import { AuthResponse, LoginRequest, Message, MessageResponse, OkResponse, UserChannelResponse } from "../shared/types";
+import { AuthResponse, LoginRequest, Message, MessageResponse, OkResponse, UserChannelResponse, UserRequest, UserResponse } from "../shared/types";
 
 // fetch users from the server
 async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void) {
@@ -22,9 +22,10 @@ async function getMessages(onSuccess: (messages: OkResponse<MessageResponse>) =>
         const data = await response.json();
         // Call the onSuccess callback with the retrieved message data
         onSuccess(data);
-    } catch (error) {
+
+    } catch (error: any) {
         // Call the onError callback in case of an error during message data retrieval
-        onError(error);
+        onError(error?.message);
     }
 }
 
@@ -58,9 +59,39 @@ async function login(onSuccess: (authResponse: OkResponse<AuthResponse>) => void
             body: JSON.stringify(body),
         });
         const data = await response.json();
+
+        if (response.status !== 200) {
+            throw new Error(data.message)
+        }
+
         // Call the onSuccess callback with the retrieved message data
         onSuccess(data);
-    } catch (error) {
+    } catch (error: any) {
+        // Call the onError callback in case of an error during message data retrieval
+        onError(error);
+    }
+}
+
+// fetch the user info
+async function getMyProfile(onSuccess: (userResponse: OkResponse<UserResponse>) => void, onError: (error: any) => void, body: UserRequest) {
+    try {
+        // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
+        const response = await fetch(`api/v1/user/me`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+        const data = await response.json();
+
+        if (response.status !== 200) {
+            throw new Error(data.message)
+        }
+
+        // Call the onSuccess callback with the retrieved message data
+        onSuccess(data);
+    } catch (error: any) {
         // Call the onError callback in case of an error during message data retrieval
         onError(error);
     }
@@ -71,7 +102,8 @@ const api = {
     getUserChannels,
     getMessages,
     sendMessage,
-    login
+    login,
+    getMyProfile
 }
 
 export default api;

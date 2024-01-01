@@ -1,24 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-const TOKEN_COOKIE_KEY = 'jwt-token';
-
-export interface AuthToken {
-    token: string | null;
-    updateToken: (token: string | null) => void
+export interface CookieOptions extends Cookies.CookieAttributes {
+  key: string;
 }
 
-export const useAuthToken = (): AuthToken => {
-    const [token, setToken] = useState<string | null>(() => Cookies.get(TOKEN_COOKIE_KEY) ?? null);
+export const useCookie = (options: CookieOptions) => {
+  const [cookieValue, setCookieValue] = useState<string | undefined>(() => Cookies.get(options.key));
 
-    const updateToken = (newToken: string | null) => {
-        setToken(newToken);
-        if (newToken) {
-            Cookies.set(TOKEN_COOKIE_KEY, newToken, { expires: 7 }); // Set the token to expire in 7 days (adjust as needed)
-        } else {
-            Cookies.remove(TOKEN_COOKIE_KEY);
-        }
+  useEffect(() => {
+    const fetchCookie = () => {
+      const value = Cookies.get(options.key);
+      setCookieValue(value);
     };
 
-    return { token, updateToken };
+    fetchCookie();
+  }, [options.key]);
+
+  const setCookie = (value: string, cookieOptions?: Cookies.CookieAttributes) => {
+    Cookies.set(options.key, value, { ...options, ...cookieOptions });
+    setCookieValue(value);
+  };
+
+  const removeCookie = (cookieOptions?: Cookies.CookieAttributes) => {
+    Cookies.remove(options.key, { ...options, ...cookieOptions });
+    setCookieValue(undefined);
+  };
+
+  return { cookieValue, setCookie, removeCookie };
 };

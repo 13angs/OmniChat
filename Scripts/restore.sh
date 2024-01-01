@@ -45,13 +45,13 @@ local_compressed_path="${local_path}.tar.gz"
 remote_path="/backup/$backup_file_name"
 
 # decompress the backup
-tar -xvzf $local_path
+tar -xvzf $local_compressed_path
 
 
 # Check if the MongoDB pod is running
 if kubectl get pods $pod_name &> /dev/null; then
     # copy the backup folder to remote
-    kubectl cp "$backup_file_name:$remote_path"
+    kubectl cp $backup_file_name "$pod_name:$remote_path"
 
     # restore the database
     kubectl exec $pod_name -- mongorestore --dir $remote_path --username $username --password $password

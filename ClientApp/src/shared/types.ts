@@ -1,7 +1,13 @@
 export interface User {
     _id: string;
+    provider_id: string;
+    username: string;
     name: string;
-    avatar: string;
+    first_name: string;
+    last_name: string;
+    avatar: string | null;
+    created_timestamp: number;
+    modified_timestamp: number;
 }
 export interface UserChannel {
     _id: string;
@@ -15,19 +21,19 @@ export interface UserChannel {
     message_exchange: string; // Assuming this is an enum
     from: MessageFrom; // Assuming MessageFrom is a type defined elsewhere
     to: MessageTo;   // Assuming MessageUser is a type defined elsewhere
-    latest_message?: string; 
-    is_read?: boolean; 
+    latest_message?: string;
+    is_read?: boolean;
     related_users?: RelatedUser[]; // Assuming RelatedUser is a type defined below
 }
 interface RelatedUser {
     user_id: string;
     is_read: boolean;
 }
-export interface MessageFrom{
+export interface MessageFrom {
     ref_id?: string;
     name?: string;
 }
-export interface MessageTo{
+export interface MessageTo {
     user_id?: string;
     name?: string
 }
@@ -42,28 +48,33 @@ export interface Message {
     channel_type?: string; // Assuming this is an enum
     operation_mode?: string; // Assuming this is an enum
     message_exchange?: string; // Assuming this is an enum
-    message_object?: any; 
+    message_object?: any;
     from?: MessageFrom; // Assuming MessageFrom is a type defined below
     to?: MessageTo;   // Assuming MessageUser is a type defined below
 }
 
 // responses
-export interface OkResponse<T>{
+export interface OkResponse<T> {
     data: T
 }
-export interface UserChannelResponse{
+export interface UserChannelResponse {
     user_channels: UserChannel[]
 }
-export interface MessageResponse{
+export interface MessageResponse {
     messages: Message[]
 }
-export interface AuthResponse{
+export interface AuthResponse {
     token: string
+}
+export interface UserResponse {
+    user: User
 }
 
 // request
-export interface LoginRequest
-{
+export interface LoginRequest {
     username: string;
     password: string;
+}
+export interface UserRequest {
+    token?: string;
 }

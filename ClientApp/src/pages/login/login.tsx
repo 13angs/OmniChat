@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { AuthResponse, LoginRequest, OkResponse } from '../../shared/types';
 import api from '../../utils/api';
-import { useAuthToken } from '../../shared/customHooks';
+import { CookieOptions, useCookie } from '../../shared/customHooks';
+import { useNavigate } from 'react-router-dom';
+
+const TOKEN_COOKIE_KEY = 'jwt-token';
 
 interface LoginFormProps {
     onSubmit: (username: string, password: string) => void;
@@ -43,13 +46,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     );
 };
 
+const tokenProfileOptions: CookieOptions = {
+    key: TOKEN_COOKIE_KEY
+}
 
 const Login: React.FC = () => {
-    const { updateToken } = useAuthToken();
+    const navigate = useNavigate();
+    const { setCookie } = useCookie(tokenProfileOptions);
 
     const handleLoginSuccess = (authResponse: OkResponse<AuthResponse>) => {
-        updateToken(authResponse.data.token);
-        alert('Login successful!'); // Replace this with actual logic.
+        setCookie(authResponse.data.token);
+        navigate('/welcome')
     }
     const handleLoginSubmit = (username: string, password: string) => {
         // Assuming you make an API request here using fetch or axios
@@ -59,10 +66,8 @@ const Login: React.FC = () => {
             password
         };
 
-        api.login(handleLoginSuccess, (err) => { console.log(err) }, loginRequest)
+        api.login(handleLoginSuccess, (err) => { alert(err.message) }, loginRequest)
         // For simplicity, I'll log the credentials and show a success message.
-
-        // If you have a server, make an API call here and handle the response.
     };
 
     return (
