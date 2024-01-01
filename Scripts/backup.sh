@@ -1,13 +1,31 @@
 #!/bin/bash
 
 # Usage:
-# - export the pod_name
-# - export the password
+# - cd to Scripts/
+# - export pod_name=<pod-name>
+# - export password=<mongo-password>
 # - run the script ./backup.sh
+
+label="app=mongo-service"
+
+# Get the pod name using the correct label
+pod_name=$(kubectl get pods -l "$label" -o jsonpath='{.items[0].metadata.name}')
 
 # MongoDB connection details
 port="27017"
 username="root"
+
+# Check if required environment variables are set
+if [[ -z "$pod_name" ]]; then
+    echo "Error: Please set the environment variables pod_name."
+    exit 1
+elif [[ -z "$password" ]]; then
+    echo "Error: Please set the environment variables password."
+    exit 1
+fi
+
+echo "pod_name: $pod_name"
+echo "password: $password"
 
 # Generate a timestamp for the backup directory
 timestamp=$(date +'%Y%m%d%H%M%S')
