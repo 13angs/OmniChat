@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 using OmniChat.Configurations;
 using OmniChat.Hubs;
 using OmniChat.Interfaces;
+using OmniChat.Middlewares;
 using OmniChat.Repositories;
 using OmniChat.Services;
 using Serilog;
@@ -87,6 +88,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseCors(configuration["CorsName"]!);
+app.UseExceptionHandlerMiddleware();
 
 app.UseStaticFiles();
 app.UseRouting();

@@ -21,19 +21,12 @@ namespace OmniChat.Services
         {
             if (AuthHandler.HandleLogin(request))
             {
-                try
+                var user = await AuthenticateUserAsync(request.Username, request.Password);
+                var token = _jwtService.GenerateJwtToken(user);
+                return new AuthResponse
                 {
-                    var user = await AuthenticateUserAsync(request.Username, request.Password);
-                    var token = _jwtService.GenerateJwtToken(user);
-                    return new AuthResponse
-                    {
-                        Token = token
-                    };
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, ex.Message);
-                }
+                    Token = token
+                };
             }
 
             throw new BadHttpRequestException("Username and password can not be null!");
