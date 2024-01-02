@@ -50,6 +50,9 @@ tar -xvzf $local_compressed_path
 
 # Check if the MongoDB pod is running
 if kubectl get pods $pod_name &> /dev/null; then
+    # create the backup dir if not exist
+    kubectl exec $pod_name -- mkdir -p /backup
+    
     # copy the backup folder to remote
     kubectl cp $backup_file_name "$pod_name:$remote_path"
 

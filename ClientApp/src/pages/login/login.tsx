@@ -3,8 +3,7 @@ import { AuthResponse, LoginRequest, OkResponse } from '../../shared/types';
 import api from '../../utils/api';
 import { CookieOptions, useCookie } from '../../shared/customHooks';
 import { useNavigate } from 'react-router-dom';
-
-const TOKEN_COOKIE_KEY = 'jwt-token';
+import { contants } from '../../shared/contants';
 
 interface LoginFormProps {
     onSubmit: (username: string, password: string) => void;
@@ -47,7 +46,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 };
 
 const tokenProfileOptions: CookieOptions = {
-    key: TOKEN_COOKIE_KEY
+    key: contants.TOKEN_COOKIE_KEY
 }
 
 const Login: React.FC = () => {
