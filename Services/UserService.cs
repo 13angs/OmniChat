@@ -1,3 +1,4 @@
+using OmniChat.DTOs;
 using OmniChat.Handlers;
 using OmniChat.Interfaces;
 using OmniChat.Models;
@@ -79,7 +80,7 @@ namespace OmniChat.Services
 
                 var allUserIds = userIds.Append(request.UserId);
 
-                IEnumerable<User> users = _userRepo
+                IEnumerable<UserDto> users = _userRepo
                     .FindUsersByFriend(request.ProviderId!, allUserIds!);
                 userResponse.Users = users.ToList();
                 return userResponse;

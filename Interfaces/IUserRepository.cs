@@ -1,3 +1,4 @@
+using OmniChat.DTOs;
 using OmniChat.Models;
 
 namespace OmniChat.Interfaces
@@ -10,7 +11,7 @@ namespace OmniChat.Interfaces
         public Task UpdateProviderAsync(string userId, string providerId);
         public IEnumerable<User> FindAllUsers();
         public Task InsertManyAsync(List<User> users);
-        public Task<List<User>> FindUsersByProviderId(UserRequest request);
-        public IEnumerable<User> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn=false);
+        public Task<List<UserDto>> FindUsersByProviderId(UserRequest request);
+        public IEnumerable<UserDto> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn=false);
     }
 }

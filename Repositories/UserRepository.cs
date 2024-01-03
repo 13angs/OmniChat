@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using OmniChat.Configurations;
+using OmniChat.DTOs;
 using OmniChat.Exceptions;
 using OmniChat.Interfaces;
 using OmniChat.Models;
@@ -42,7 +44,7 @@ namespace OmniChat.Repositories
             return user;
         }
 
-        public IEnumerable<User> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn = false)
+        public IEnumerable<UserDto> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn = false)
         {
             var builder = Builders<User>.Filter;
 
@@ -55,16 +57,39 @@ namespace OmniChat.Repositories
             if (!isIn)
             {
                 return _usersCollection
-                    .Find(filter)
+                    .Aggregate()
+                    .Match(filter)
+                    .AppendStage<BsonDocument>(new BsonDocument
+                    {
+                        { "$addFields", new BsonDocument
+                            {
+                                { "current_status", RelationshipStatus.unfollow } // Corrected the value to be a string
+                            }
+                        }
+                    })
+                    .Project(new BsonDocument{
+                        { "_id", 1 },
+                        { "provider_id", 1 },
+                        { "username", 1 },
+                        { "name", 1 },
+                        { "first_name", 1 },
+                        { "last_name", 1 },
+                        { "avatar", 1 },
+                        { "created_timestamp", 1 },
+                        { "modified_timestamp", 1 },
+                        { "current_status", 1 },
+                    })
+                    .As<UserDto>()
                     .ToEnumerable();
             }
             throw new NotImplementedException("Query not implemented");
         }
 
-        public async Task<List<User>> FindUsersByProviderId(UserRequest request)
+        public async Task<List<UserDto>> FindUsersByProviderId(UserRequest request)
         {
 
             return await _usersCollection.Find(u => u.ProviderId == request.ProviderId)
+                .As<UserDto>()
                 .ToListAsync();
         }
 

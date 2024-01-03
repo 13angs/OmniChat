@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using OmniChat.DTOs;
 
 namespace OmniChat.Models
 {
@@ -73,7 +74,7 @@ namespace OmniChat.Models
     public class UserResponse
     {
         [JsonProperty("users", NullValueHandling = NullValueHandling.Ignore)]
-        public List<User>? Users { get; set; }
+        public List<UserDto>? Users { get; set; }
         
         [JsonProperty("user", NullValueHandling = NullValueHandling.Ignore)]
         public User? User { get; set; }
