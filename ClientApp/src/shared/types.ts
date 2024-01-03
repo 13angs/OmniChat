@@ -8,6 +8,7 @@ export interface User {
     avatar: string | null;
     created_timestamp: number;
     modified_timestamp: number;
+    current_status: number;
 }
 export interface UserChannel {
     _id: string;
@@ -67,7 +68,8 @@ export interface AuthResponse {
     token: string
 }
 export interface UserResponse {
-    user: User
+    user: User;
+    users: User[]
 }
 
 // request

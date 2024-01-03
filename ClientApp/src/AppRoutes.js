@@ -1,4 +1,5 @@
 import Chat from "./pages/chat/Chat";
+import FriendsPage from "./pages/friend/Friend";
 import Login from "./pages/login/login";
 import Welcome from "./pages/welcome/welcome";
 
@@ -18,6 +19,10 @@ const AppRoutes = [
   {
     path: '/welcome',
     element: <Welcome />
+  },
+  {
+    path: '/friends',
+    element: <FriendsPage />
   }
 ];
 
