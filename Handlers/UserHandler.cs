@@ -22,5 +22,10 @@ namespace OmniChat.Handlers
 
             throw new BadHttpRequestException("user_id can not be null");
         }
+        public static bool HandleGetUnfollowedUsersInProvider(UserRequest request) => (
+                    request.By == RequestParam.friend &&
+                    RequiredPropsHandler.HandleRequiredProps("provider_id", request.ProviderId) &&
+                    RequiredPropsHandler.HandleRequiredProps("user_id", request.UserId) &&
+                    request.CurrentStatus == RelationshipStatus.unfollow);
     }
 }

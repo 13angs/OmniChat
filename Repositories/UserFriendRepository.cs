@@ -36,6 +36,28 @@ namespace OmniChat.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public IEnumerable<UserFriend> FindUserFriendsByFriend(string providerId, string userId, RelationshipStatus currentStatus)
+        {
+
+            var builder = Builders<UserFriend>.Filter;
+
+            // current_status=follow
+            var filter = builder.And(
+                builder.Eq(x => x.ProviderId, providerId),
+                builder.Eq(x => x.UserId, userId),
+                builder.Eq(x => x.CurrentStatus, currentStatus)
+            );
+
+            if (currentStatus == RelationshipStatus.follow)
+            {
+                return _userFriendsCollection
+                    .Find(filter)
+                    .ToEnumerable();
+            }
+
+            throw new NotImplementedException("Query not implemented");
+        }
+
         public async Task InsertManyAsync(List<UserFriend> friends)
         {
             await _userFriendsCollection.InsertManyAsync(friends);
@@ -49,9 +71,9 @@ namespace OmniChat.Repositories
 
         public async Task UpdateCurrentStatusAsync(UserFriend friend)
         {
-            var update = Builders<UserFriend>.Update.Set(u=>u.CurrentStatus, friend.CurrentStatus);
+            var update = Builders<UserFriend>.Update.Set(u => u.CurrentStatus, friend.CurrentStatus);
             await _userFriendsCollection
-                .UpdateOneAsync(u=>u.Id==friend.Id, update);
+                .UpdateOneAsync(u => u.Id == friend.Id, update);
         }
     }
 }

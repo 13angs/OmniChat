@@ -52,6 +52,12 @@ namespace OmniChat.Middlewares
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 Log.Warning(ex.Message);
             }
+            else if (ex is NotImplementedException)
+            {
+                response.Status = StatusCodes.Status501NotImplemented;
+                context.Response.StatusCode = StatusCodes.Status501NotImplemented;
+                Log.Warning(ex.Message);
+            }
             else
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;

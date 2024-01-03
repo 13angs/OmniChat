@@ -88,9 +88,13 @@ namespace OmniChat.Models
         [FromQuery(Name = "token")]
         public string? Token { get; set; }
         
-        // [JsonProperty("user_id")]
+        [JsonProperty("user_id", NullValueHandling=NullValueHandling.Ignore)]
         [FromQuery(Name = "user_id")]
         public string? UserId { get; set; }
+        
+        [JsonProperty("current_status", NullValueHandling=NullValueHandling.Ignore)]
+        [FromQuery(Name = "current_status")]
+        public RelationshipStatus CurrentStatus { get; set; }
     }
 
     public class RelatedUser

@@ -11,5 +11,6 @@ namespace OmniChat.Interfaces
         public IEnumerable<User> FindAllUsers();
         public Task InsertManyAsync(List<User> users);
         public Task<List<User>> FindUsersByProviderId(UserRequest request);
+        public IEnumerable<User> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn=false);
     }
 }

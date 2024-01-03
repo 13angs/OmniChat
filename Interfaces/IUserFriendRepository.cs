@@ -8,5 +8,6 @@ namespace OmniChat.Interfaces
         public Task InsertOneAsync(UserFriend userFriend);
         public Task InsertManyAsync(List<UserFriend> friends);
         public Task UpdateCurrentStatusAsync(UserFriend friend);
+        public IEnumerable<UserFriend> FindUserFriendsByFriend(string providerId, string userId, RelationshipStatus currentStatus);
     }
 }

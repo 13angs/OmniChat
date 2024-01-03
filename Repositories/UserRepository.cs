@@ -1,4 +1,3 @@
-using System.Data;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using OmniChat.Configurations;
@@ -41,6 +40,25 @@ namespace OmniChat.Repositories
                 .Find(u => u.Username == username)
                 .FirstOrDefaultAsync();
             return user;
+        }
+
+        public IEnumerable<User> FindUsersByFriend(string providerId, IEnumerable<string> userIds, bool isIn = false)
+        {
+            var builder = Builders<User>.Filter;
+
+            // is not in userIds
+            var filter = builder.And(
+                builder.Eq(x => x.ProviderId, providerId),
+                builder.Nin(x => x.Id, userIds)
+            );
+
+            if (!isIn)
+            {
+                return _usersCollection
+                    .Find(filter)
+                    .ToEnumerable();
+            }
+            throw new NotImplementedException("Query not implemented");
         }
 
         public async Task<List<User>> FindUsersByProviderId(UserRequest request)
