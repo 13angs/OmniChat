@@ -2,15 +2,16 @@ import Chat from "./pages/chat/Chat";
 import FriendsPage from "./pages/friend/Friend";
 import Login from "./pages/login/login";
 import Welcome from "./pages/welcome/welcome";
+import MainContainer from "./containers/main/MainContainer";
 
 const AppRoutes = [
   {
     index: true,
-    element: <Chat />
+    element: <MainContainer><Chat /></MainContainer>
   },
   {
     path: '/chat',
-    element: <Chat />
+    element: <MainContainer><Chat /></MainContainer>
   },
   {
     path: '/login',
@@ -22,7 +23,7 @@ const AppRoutes = [
   },
   {
     path: '/friends',
-    element: <FriendsPage />
+    element: <MainContainer><FriendsPage /></MainContainer>
   }
 ];
 
