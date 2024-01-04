@@ -29,8 +29,7 @@ namespace OmniChat.Controllers
         [Route("channel/friend/add")]
         public async Task<ActionResult> AddFriend([FromBody] UserChannelRequest request)
         {
-            await _userChannelService.AddFriendAsync(request);
-            return StatusCode(StatusCodes.Status201Created);
+            return StatusCode(StatusCodes.Status201Created, await _userChannelService.AddFriendAsync(request));
         }
     }
 }

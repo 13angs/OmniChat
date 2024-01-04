@@ -14,7 +14,7 @@ namespace OmniChat.Services
             _userChannelRepo = userChannelRepo;
             _userFriendRepo = userFriendRepo;
         }
-        public async Task AddFriendAsync(UserChannelRequest request)
+        public async Task<OkResponse<string>> AddFriendAsync(UserChannelRequest request)
         {
             if (string.IsNullOrEmpty(request.ProviderId))
             {
@@ -43,7 +43,10 @@ namespace OmniChat.Services
             {
                 userFriend.CurrentStatus = RelationshipStatus.follow;
                 await _userFriendRepo.UpdateCurrentStatusAsync(userFriend);
-                return;
+                return new OkResponse<string>
+                {
+                    Message = $"Added {request.To.Name} as friend"
+                };
             }
 
             UserChannel userChannel = new UserChannel
@@ -93,6 +96,10 @@ namespace OmniChat.Services
             };
 
             await _userFriendRepo.InsertManyAsync(friends);
+            return new OkResponse<string>
+            {
+                Message = $"Added {request.To.Name} as friend"
+            };
         }
 
         public async Task<UserChannelResponse> GetUserChannelsAsync(UserChannelRequest request)

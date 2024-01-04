@@ -57,6 +57,7 @@ export interface Message {
 // responses
 export interface OkResponse<T> {
     data: T
+    message?: string | null
 }
 export interface UserChannelResponse {
     user_channels: UserChannel[]
@@ -82,4 +83,6 @@ export interface UserRequest {
     provider_id?: string;
     user_id?: string;
     current_status?: string;
+    from?: MessageFrom;
+    to?: MessageTo; 
 }
