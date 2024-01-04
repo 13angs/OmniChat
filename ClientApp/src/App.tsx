@@ -8,7 +8,8 @@ export default function App() {
     <Routes>
       {AppRoutes.map((route, index) => {
         const { element, ...rest } = route;
-        return <Route key={index} {...rest} element={element} />;
+        const keyInd = index;
+        return <Route key={keyInd} {...rest} element={element} />;
       })}
     </Routes>
   );

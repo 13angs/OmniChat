@@ -79,4 +79,7 @@ export interface LoginRequest {
 }
 export interface UserRequest {
     token?: string;
+    provider_id?: string;
+    user_id?: string;
+    current_status?: string;
 }

@@ -98,17 +98,22 @@ async function getMyProfile(onSuccess: (userResponse: OkResponse<UserResponse>) 
 }
 
 // fetch messages for a specific user from the server
-async function getUserFriends(onSuccess: (userFriends: OkResponse<UserResponse>) => void, onError: (error: any) => void) {
+async function getUserFriends(onSuccess: (userFriends: OkResponse<UserResponse>) => void, onError: (error: any) => void, userRequest: UserRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await fetch(`api/v1/users?by=friend&provider_id=ac82a067-cd30-49a7-bec9-ab46fdf873d7&user_id=33a4e8b4-7942-440d-83ff-a66fa37e01d6&current_status=unfollow`);
+        const response = await fetch(`api/v1/users?by=friend&provider_id=${userRequest.provider_id}&user_id=${userRequest.user_id}&current_status=${userRequest.current_status}`);
         const data = await response.json();
+
+        if (response.status !== 200) {
+            throw new Error(data.message)
+        }
+
         // Call the onSuccess callback with the retrieved message data
         onSuccess(data);
 
     } catch (error: any) {
         // Call the onError callback in case of an error during message data retrieval
-        onError(error?.message);
+        onError(error);
     }
 }
 
