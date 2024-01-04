@@ -1,6 +1,8 @@
 // Drawer.tsx
 
 import React from 'react';
+import { Facebook, Users } from 'react-feather';
+import { Link } from 'react-router-dom';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -16,6 +18,15 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, toggleDrawer }) => {
     >
       {/* Menu Icon for Closing Drawer */}
       <p className="text-2xl font-bold mb-4">Drawer Content</p>
+
+      {/* Menu Items/Links */}
+      <Link to="/chat" onClick={toggleDrawer} className="flex py-2 px-2 hover:bg-gray-700">
+        <Facebook className="mr-2" />Chat
+      </Link>
+      <Link to="/friends" onClick={toggleDrawer} className="flex py-2 px-2 hover:bg-gray-700">
+        <Users className="mr-2" /> Friends
+      </Link>
+
       {/* Add additional items in the drawer as needed */}
     </div>
   );
