@@ -13,7 +13,7 @@ const myProfileOptions: CookieOptions = {
     key: contants.MY_PROFILE_COOKIE_KEY
 }
 
-const Welcome: React.FC = () => {
+const WelcomePage: React.FC = () => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState<User | null>(null);
     const { cookieValue: token } = useCookie(tokenProfileOptions);
@@ -56,4 +56,4 @@ const Welcome: React.FC = () => {
     );
 };
 
-export default Welcome;
+export default WelcomePage;

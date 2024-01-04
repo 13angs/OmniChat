@@ -49,7 +49,7 @@ const tokenProfileOptions: CookieOptions = {
     key: contants.TOKEN_COOKIE_KEY
 }
 
-const Login: React.FC = () => {
+const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const { setCookie } = useCookie(tokenProfileOptions);
 
@@ -79,4 +79,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login;
+export default LoginPage;

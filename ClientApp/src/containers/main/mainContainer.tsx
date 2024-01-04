@@ -1,7 +1,7 @@
 // MainContainer.tsx
 
 import React, { ReactNode, createContext, useContext, useMemo, useState } from 'react';
-import Drawer from '../../components/drawer/Drawer';
+import Drawer from '../../components/drawer/drawer';
 import { Menu } from 'react-feather';
 import { CookieOptions, useCookie } from '../../shared/customHooks';
 import { contants } from '../../shared/contants';

@@ -1,25 +1,25 @@
-import Chat from "./pages/chat/Chat";
-import FriendsPage from "./pages/friend/Friend";
-import Login from "./pages/login/login";
-import Welcome from "./pages/welcome/welcome";
-import MainContainer from "./containers/main/MainContainer";
+import ChatPage from "./pages/chat/chat";
+import FriendsPage from "./pages/friend/friend";
+import LoginPage from "./pages/login/login";
+import WelcomePage from "./pages/welcome/welcome";
+import MainContainer from "./containers/main/mainContainer";
 
 const AppRoutes = [
   {
     index: true,
-    element: <MainContainer><Chat /></MainContainer>
+    element: <MainContainer><ChatPage /></MainContainer>
   },
   {
     path: '/chat',
-    element: <MainContainer><Chat /></MainContainer>
+    element: <MainContainer><ChatPage /></MainContainer>
   },
   {
     path: '/login',
-    element: <Login />
+    element: <LoginPage />
   },
   {
     path: '/welcome',
-    element: <Welcome />
+    element: <WelcomePage />
   },
   {
     path: '/friends',

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import { OkResponse, User, UserRequest, UserResponse } from '../../shared/types';
-import { useMainContainerContext } from '../../containers/main/MainContainer';
+import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useLocation } from 'react-router-dom';
 
 const FriendsPage: React.FC = () => {

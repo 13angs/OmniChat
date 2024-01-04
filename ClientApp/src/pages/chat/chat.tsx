@@ -6,7 +6,7 @@ import { useGetMessages, useGetUserChannels, useSignalRReceiveMessage, useSignal
 
 interface ChatProps { }
 
-const Chat: React.FC<ChatProps> = () => {
+const ChatPage: React.FC<ChatProps> = () => {
   const [userChannels, setUserChannels] = useState<UserChannel[]>([]);
   const [selectedUserChannel, setSelectedUserChannel] = useState<UserChannel | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -125,4 +125,4 @@ const Chat: React.FC<ChatProps> = () => {
   );
 };
 
-export default Chat;
+export default ChatPage;
