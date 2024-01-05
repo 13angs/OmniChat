@@ -1,7 +1,6 @@
 // useSignalREffects.ts
 import { useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
-// import { HttpTransportType } from '@microsoft/signalr';
 import websocket from '../../utils/websocket';
 
 interface SignalREffectsProps {
