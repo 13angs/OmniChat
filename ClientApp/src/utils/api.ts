@@ -1,12 +1,16 @@
-import { AuthResponse, LoginRequest, Message, MessageResponse, OkResponse, UserChannelResponse, UserRequest, UserResponse } from "../shared/types";
+import { AuthResponse, LoginRequest, Message, MessageResponse, OkResponse, UserChannelRequest, UserChannelResponse, UserRequest, UserResponse } from "../shared/types";
 
 // fetch users from the server
-async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void) {
+async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void, userChannelRequest: UserChannelRequest) {
     try {
         // Fetch users from the 'api/chat/users' endpoint
-        const response = await fetch('api/v1/user/channels?by=provider&provider_id=ac82a067-cd30-49a7-bec9-ab46fdf873d7');
+        const response = await fetch(`api/v1/user/channels?by=${userChannelRequest.by}&provider_id=${userChannelRequest.provider_id}`);
         const data = await response.json();
         // Call the onSuccess callback with the retrieved user data
+
+        if (response.status !== 200) {
+            throw new Error(data.message);
+        }
         onSuccess(data);
     } catch (error) {
         // Call the onError callback in case of an error during user data retrieval

@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import api from "../../utils/api";
-import { Message, MessageResponse, OkResponse, UserChannel, UserChannelResponse } from "../../shared/types";
+import { Message, MessageResponse, OkResponse, UserChannel, UserChannelRequest, UserChannelResponse } from "../../shared/types";
+import { useMainContainerContext } from "../../containers/main/mainContainer";
+import { RequestParam } from "../../shared/contants";
 
 interface GetUsersProps {
     setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>;
@@ -95,6 +97,7 @@ const useSignalRUserChannelSelected = ({ connection, userChannels, setSelectedUs
 
 // Custom hook for fetching user_channels and setting the selected user based on the user_id from the URL
 const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUsersProps) => {
+    const { myProfile } = useMainContainerContext();
 
     // Function to handle successful user data retrieval
     const handleGetUsersSuccess = (response: OkResponse<UserChannelResponse>): void => {
@@ -114,9 +117,14 @@ const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUser
         }
     }
 
+    const userChannelRequest: UserChannelRequest = useMemo(() => ({
+        by: RequestParam.provider,
+        provider_id: myProfile?.provider_id
+    }), [myProfile?.provider_id])
+
     // fetch users when the component mounts
     useEffect(() => {
-        api.getUserChannels(handleGetUsersSuccess, (error) => { console.error('Error fetching users:', error); })
+        api.getUserChannels(handleGetUsersSuccess, (error) => { console.error('Error fetching users:', error); }, userChannelRequest)
         // eslint-disable-next-line
     }, [])
 }

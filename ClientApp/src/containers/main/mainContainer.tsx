@@ -1,11 +1,13 @@
 // MainContainer.tsx
 
-import React, { ReactNode, createContext, useContext, useMemo, useState } from 'react';
+import React, { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import Drawer from '../../components/drawer/drawer';
 import { Menu } from 'react-feather';
 import { CookieOptions, useCookie } from '../../shared/customHooks';
 import { contants } from '../../shared/contants';
 import { User } from '../../shared/types'
+import { useNavigate } from 'react-router-dom';
+import AppRoutes from '../../AppRoutes';
 
 // Create a context with initial state
 interface MainContainerContextProps {
@@ -36,12 +38,24 @@ const myProfileOptions: CookieOptions = {
 const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const { cookieValue } = useCookie(myProfileOptions);
+    const navigate = useNavigate();
 
     const toggleDrawer = () => {
         setIsDrawerOpen((prevIsOpen) => !prevIsOpen);
     };
 
-    const obj = useMemo(() => ({ isDrawerOpen, toggleDrawer, myProfile: JSON.parse(cookieValue ?? "") }), [isDrawerOpen, cookieValue])
+    const obj = useMemo(() => {
+        if (cookieValue) {
+            return { isDrawerOpen, toggleDrawer, myProfile: JSON.parse(cookieValue ?? "") }
+        }
+        return { isDrawerOpen, toggleDrawer, myProfile: null }
+    }, [cookieValue, isDrawerOpen])
+
+    useEffect(() => {
+        if (!cookieValue) {
+            navigate(AppRoutes.login.path);
+        }
+    }, [cookieValue, navigate])
 
     return (
         <MainContainerContext.Provider value={obj}>

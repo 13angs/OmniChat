@@ -68,7 +68,7 @@ const ChatPage: React.FC<ChatProps> = () => {
                 className={`cursor-pointer mb-2 p-2 rounded ${selectedUserChannel?._id === userChannel._id ? 'bg-blue-200' : 'bg-gray-200'}`}
                 onClick={() => selectUserChannel(userChannel)}
               >
-                {userChannel.from.name}
+                {userChannel.to.name}
               </button>
             ))}
         </div>
@@ -78,10 +78,10 @@ const ChatPage: React.FC<ChatProps> = () => {
           <div className="border-b">
             <div className="w-12 h-12 rounded-full mb-2 overflow-hidden">
               {/* Use the Image component from next/image */}
-              {selectedUserChannel.from.name ? (
+              {selectedUserChannel.to.name ? (
                 <img
-                  src={selectedUserChannel.from.name}
-                  alt={selectedUserChannel.from.name}
+                  src={selectedUserChannel.to.name}
+                  alt={selectedUserChannel.to.name}
                   className="w-12 h-12 rounded-full mb-2"
                   width={100}
                   height={100}
@@ -89,12 +89,12 @@ const ChatPage: React.FC<ChatProps> = () => {
               ) : (
                 <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full mb-2">
                   <p className="text-xl font-semibold text-gray-600">
-                    {selectedUserChannel?.from?.name?.charAt(0).toUpperCase()}
+                    {selectedUserChannel?.to?.name?.charAt(0).toUpperCase()}
                   </p>
                 </div>
               )}
             </div>
-            <p className="text-xl font-semibold">{selectedUserChannel.from.name}</p>
+            <p className="text-xl font-semibold">{selectedUserChannel.to.name}</p>
           </div>
         )}
         <div className="flex-1 overflow-y-scroll">

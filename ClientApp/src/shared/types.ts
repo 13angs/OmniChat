@@ -1,3 +1,5 @@
+import { RequestParam } from "./contants";
+
 export interface User {
     _id: string;
     provider_id: string;
@@ -85,4 +87,8 @@ export interface UserRequest {
     current_status?: string;
     from?: MessageFrom;
     to?: MessageTo; 
+}
+export interface UserChannelRequest {
+    by?: RequestParam;
+    provider_id?: string;
 }

@@ -6,11 +6,11 @@ export default function App() {
 
   return (
     <Routes>
-      {AppRoutes.map((route, index) => {
-        const { element, ...rest } = route;
-        const keyInd = index;
-        return <Route key={keyInd} {...rest} element={element} />;
-      })}
+      <Route index={AppRoutes.index.index} element={AppRoutes.index.element} />
+      <Route path={AppRoutes.chat.path} element={AppRoutes.chat.element} />
+      <Route path={AppRoutes.login.path} element={AppRoutes.login.element} />
+      <Route path={AppRoutes.welcome.path} element={AppRoutes.welcome.element} />
+      <Route path={AppRoutes.friend.path} element={AppRoutes.friend.element} />
     </Routes>
   );
 }
