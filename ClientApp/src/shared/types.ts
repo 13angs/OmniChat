@@ -28,9 +28,11 @@ export interface UserChannel {
     is_read?: boolean;
     related_users?: RelatedUser[]; // Assuming RelatedUser is a type defined below
 }
-interface RelatedUser {
+export interface RelatedUser {
     user_id: string;
     is_read: boolean;
+    avatar?: string;
+    name?: string;
 }
 export interface MessageFrom {
     ref_id?: string;

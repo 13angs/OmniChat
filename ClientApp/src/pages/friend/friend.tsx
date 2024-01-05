@@ -43,11 +43,13 @@ const FriendsPage: React.FC = () => {
         provider_id: selectedFriend.provider_id,
         from: {
           ref_id: myProfile._id,
-          name: myProfile.name
+          name: myProfile.name,
+          avatar: myProfile.avatar ?? ""
         },
         to: {
           user_id: selectedFriend._id,
-          name: selectedFriend.name
+          name: selectedFriend.name,
+          avatar: selectedFriend.avatar ?? ""
         }
       }
       api.addFriend(() => {

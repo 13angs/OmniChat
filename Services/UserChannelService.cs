@@ -62,11 +62,13 @@ namespace OmniChat.Services
                 RelatedUsers = new List<RelatedUser>{
                     new() { // from
                         UserId=request.From.RefId!,
-                        Avatar=request.From.Avatar
+                        Avatar=request.From.Avatar,
+                        Name=request.From.Name
                     },
                     new() { // to
                         UserId=request.To.UserId!,
                         Avatar=request.To.Avatar,
+                        Name=request.To.Name
                     }
                 }
             };

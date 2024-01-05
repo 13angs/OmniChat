@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { RelatedUser, UserChannel } from './types';
 
 export interface CookieOptions extends Cookies.CookieAttributes {
   key: string;
@@ -29,3 +30,12 @@ export const useCookie = (options: CookieOptions) => {
 
   return { cookieValue, setCookie, removeCookie };
 };
+
+export const useUserChannel = () => {
+  const findFriend = (userChannel?: UserChannel, userId?: string): RelatedUser | undefined => {
+    return userChannel?.related_users?.find(item => item.user_id !== userId);
+  }
+  return {
+    findFriend
+  }
+}

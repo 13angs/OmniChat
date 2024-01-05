@@ -9,7 +9,6 @@ import Avatar from '../../components/avatar/avatar';
 interface ChatProps { }
 
 const ChatPage: React.FC<ChatProps> = () => {
-  const [userChannels, setUserChannels] = useState<UserChannel[]>([]);
   const [selectedUserChannel, setSelectedUserChannel] = useState<UserChannel | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
@@ -19,7 +18,7 @@ const ChatPage: React.FC<ChatProps> = () => {
   // useSignalRReceiveMessage({ connection, setMessages })
   // useSignalRSelectUser({ connection, selectedUserChannel })
   // useSignalRUserChannelSelected({ connection, userChannels, setSelectedUserChannel })
-  useGetUserChannels({ setUserChannels, setSelectedUserChannel })
+
   useGetMessages({ setMessages, selectedUserChannel })
 
   // const sendMessage = async (): Promise<void> => {
@@ -55,7 +54,7 @@ const ChatPage: React.FC<ChatProps> = () => {
 
   return (
     <div className="min-h-screen flex">
-      <UserList userChannels={userChannels} selectedUserChannel={selectedUserChannel} selectUserChannel={selectUserChannel} />
+      <UserList selectUserChannel={selectUserChannel} />
       <div className="flex-1 p-4" style={{ maxHeight: '100vh', overflowY: 'scroll', display: 'flex', flexDirection: 'column' }}>
         {selectedUserChannel && (
           <Avatar
@@ -83,7 +82,7 @@ const ChatPage: React.FC<ChatProps> = () => {
             onKeyDown={handleKeyDown}
           />
           <button className="bg-blue-500 text-white px-4 py-2 rounded"
-            // onClick={sendMessage}
+          // onClick={sendMessage}
           >
             Send
           </button>

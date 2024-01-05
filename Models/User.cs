@@ -111,5 +111,9 @@ namespace OmniChat.Models
         [JsonProperty("avatar")]
         [BsonElement("avatar")]
         public string? Avatar { get; set; }
+        
+        [JsonProperty("name")]
+        [BsonElement("name")]
+        public string? Name { get; set; }
     }
 }
