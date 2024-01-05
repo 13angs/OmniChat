@@ -107,5 +107,9 @@ namespace OmniChat.Models
         [JsonProperty("is_read")]
         [BsonElement("is_read")]
         public bool IsRead { get; set; }
+        
+        [JsonProperty("avatar")]
+        [BsonElement("avatar")]
+        public string? Avatar { get; set; }
     }
 }

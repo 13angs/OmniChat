@@ -35,10 +35,12 @@ interface RelatedUser {
 export interface MessageFrom {
     ref_id?: string;
     name?: string;
+    avatar?: string;
 }
 export interface MessageTo {
     user_id?: string;
     name?: string
+    avatar?: string;
 }
 
 export interface Message {

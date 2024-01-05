@@ -49,7 +49,7 @@ namespace OmniChat.Services
                 };
             }
 
-            UserChannel userChannel = new UserChannel
+            UserChannel userChannel = new()
             {
                 Platform = Platform.in_house,
                 ProviderId = request.ProviderId,
@@ -60,11 +60,13 @@ namespace OmniChat.Services
                 To = request.To,
                 LatestMessage = string.Empty,
                 RelatedUsers = new List<RelatedUser>{
-                    new RelatedUser{ // from
+                    new() { // from
                         UserId=request.From.RefId!,
+                        Avatar=request.From.Avatar
                     },
-                    new RelatedUser{ // to
+                    new() { // to
                         UserId=request.To.UserId!,
+                        Avatar=request.To.Avatar,
                     }
                 }
             };
@@ -73,7 +75,7 @@ namespace OmniChat.Services
 
             var friends = new List<UserFriend>
             {
-                new UserFriend{ // from
+                new() { // from
                     ProviderId = request.ProviderId,
                     UserChannelId = userChannel.Id,
                     UserId = request.From.RefId!,
@@ -83,7 +85,7 @@ namespace OmniChat.Services
                         UserId = request.To.UserId!
                     }
                 },
-                new UserFriend{ // to
+                new() { // to
                     ProviderId = request.ProviderId,
                     UserChannelId = userChannel.Id,
                     UserId = request.To.UserId!,

@@ -78,10 +78,10 @@ const ChatPage: React.FC<ChatProps> = () => {
           <div className="border-b">
             <div className="w-12 h-12 rounded-full mb-2 overflow-hidden">
               {/* Use the Image component from next/image */}
-              {selectedUserChannel.to.name ? (
+              {selectedUserChannel.to.avatar ? (
                 <img
-                  src={selectedUserChannel.to.name}
-                  alt={selectedUserChannel.to.name}
+                  src={selectedUserChannel.to.avatar}
+                  alt={selectedUserChannel.to.avatar}
                   className="w-12 h-12 rounded-full mb-2"
                   width={100}
                   height={100}

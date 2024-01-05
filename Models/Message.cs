@@ -96,6 +96,11 @@ namespace OmniChat.Models
         [BsonElement("name")]
         [FromQuery(Name = "name")]
         public string? Name { get; set; }
+
+        [JsonProperty("avatar")]
+        [BsonElement("avatar")]
+        [FromQuery(Name = "avatar")]
+        public string? Avatar { get; set; }
     }
     public class MessageUser
     {
@@ -108,6 +113,11 @@ namespace OmniChat.Models
         [BsonElement("name")]
         [FromQuery(Name = "name")]
         public string? Name { get; set; }
+
+        [JsonProperty("avatar")]
+        [BsonElement("avatar")]
+        [FromQuery(Name = "avatar")]
+        public string? Avatar { get; set; }
     }
 
     public class MessageResponse
