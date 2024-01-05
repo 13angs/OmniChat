@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo } from "react";
 import api from "../../utils/api";
-import { Message, MessageResponse, OkResponse, UserChannel, UserChannelRequest, UserChannelResponse } from "../../shared/types";
+import { Message, MessageRequest, MessageResponse, OkResponse, User, UserChannel, UserChannelRequest, UserChannelResponse, UserRequest, UserResponse } from "../../shared/types";
 import { useMainContainerContext } from "../../containers/main/mainContainer";
 import { RequestParam } from "../../shared/contants";
 
 interface GetUsersProps {
     setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>;
-    setSelectedUserChannel: React.Dispatch<React.SetStateAction<UserChannel | null>>;
 }
 
 interface GetMessagesProps {
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-    selectedUserChannel: UserChannel | null;
+    messageRequest: MessageRequest
+    // selectedUserChannel: UserChannel | null;
 }
 
 interface UserSelectedProps {
@@ -28,6 +28,11 @@ interface SelectUserProps {
 interface ReceiveMessageProps {
     connection: signalR.HubConnection | null;
     setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}
+
+interface GetUserProfileProps {
+    setUserProfile: React.Dispatch<React.SetStateAction<User | null>>;
+    userRequest: UserRequest | null;
 }
 
 // Custom hook for recieving message in real-time
@@ -96,7 +101,7 @@ const useSignalRUserChannelSelected = ({ connection, userChannels, setSelectedUs
 }
 
 // Custom hook for fetching user_channels and setting the selected user based on the user_id from the URL
-const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUsersProps) => {
+const useGetUserChannels = ({ setUserChannels }: GetUsersProps) => {
     const { myProfile } = useMainContainerContext();
 
     // Function to handle successful user data retrieval
@@ -105,16 +110,9 @@ const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUser
         console.log(response)
 
         // Set selectedUser based on user_id from the URL
-        const url = new URL(window.location.href);
-        const user_id = url.searchParams.get('to.user_id');
-        const ref_id = url.searchParams.get('from.ref_id');
-
-        if (user_id && ref_id) {
-            const selected = response.data.user_channels.find((user: UserChannel) => user.to.user_id === user_id);
-            if (selected) {
-                setSelectedUserChannel(selected);
-            }
-        }
+        // const url = new URL(window.location.href);
+        // const user_id = url.searchParams.get('to.user_id');
+        // const ref_id = url.searchParams.get('from.ref_id');
     }
 
     const userChannelRequest: UserChannelRequest = useMemo(() => ({
@@ -130,26 +128,38 @@ const useGetUserChannels = ({ setUserChannels, setSelectedUserChannel }: GetUser
 }
 
 // Custom hook for fetching messages based on the selected user
-const useGetMessages = ({ setMessages, selectedUserChannel }: GetMessagesProps) => {
+const useGetMessages = ({ setMessages, messageRequest }: GetMessagesProps) => {
 
-    // Function to handle successful message data retrieval
-    const handleGetMessagesSuccess = (response: OkResponse<MessageResponse>): void => {
-        console.log(response.data.messages)
-        setMessages(response.data.messages)
-    }
 
     // fetch messages when the selectedUser changes
     useEffect(() => {
-        if (selectedUserChannel) {
-            const params: Message = {
-                provider_id: selectedUserChannel.provider_id,
-                from: selectedUserChannel.from,
-                to: selectedUserChannel.to
-            }
-            api.getMessages(handleGetMessagesSuccess, (error) => { console.error('Error fetching messages:', error); }, params)
+        // Function to handle successful message data retrieval
+        const handleGetMessagesSuccess = (response: OkResponse<MessageResponse>): void => {
+            setMessages(response.data.messages)
         }
-        // eslint-disable-next-line
-    }, [selectedUserChannel])
+        const params: Message = {
+            provider_id: messageRequest.provider_id,
+            from: messageRequest.from,
+            to: messageRequest.to
+        }
+        api.getMessages(handleGetMessagesSuccess, (error) => { console.error('Error fetching messages:', error); }, params)
+
+    }, [messageRequest, setMessages])
+}
+// Custom hook for fetching messages based on the selected user
+const useGetUserProfile = ({ setUserProfile, userRequest }: GetUserProfileProps) => {
+
+
+    // fetch messages when the selectedUser changes
+    useEffect(() => {
+        // Function to handle successful message data retrieval
+        const handleGetUserProfileSuccess = (response: OkResponse<UserResponse>): void => {
+            setUserProfile(response.data.user)
+        }
+
+        api.getUserProfile(handleGetUserProfileSuccess, (error) => { console.error('Error fetching messages:', error); }, userRequest ?? null)
+
+    }, [setUserProfile, userRequest])
 }
 
-export { useGetUserChannels, useGetMessages, useSignalRUserChannelSelected, useSignalRSelectUser, useSignalRReceiveMessage }
+export { useGetUserChannels, useGetMessages, useSignalRUserChannelSelected, useSignalRSelectUser, useSignalRReceiveMessage, useGetUserProfile }

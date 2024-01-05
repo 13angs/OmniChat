@@ -96,3 +96,9 @@ export interface UserChannelRequest {
     by?: RequestParam;
     provider_id?: string;
 }
+export interface MessageRequest {
+    by?: RequestParam; 
+    provider_id?: string;
+    from?: MessageFrom;
+    to?: MessageTo;
+}

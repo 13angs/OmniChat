@@ -149,6 +149,26 @@ async function addFriend(onSuccess: (userFriend: OkResponse<string>) => void, on
     }
 }
 
+// fetch messages for a specific user from the server
+async function getUserProfile(onSuccess: (userResponse: OkResponse<UserResponse>) => void, onError: (error: any) => void, userRequest: UserRequest | null) {
+    try {
+        // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
+        const response = await fetch(`api/v1/user/profile?user_id=${userRequest?.user_id}`);
+        const data = await response.json();
+
+        if (response.status !== 200) {
+            throw new Error(data.message)
+        }
+
+        // Call the onSuccess callback with the retrieved message data
+        onSuccess(data);
+
+    } catch (error: any) {
+        // Call the onError callback in case of an error during message data retrieval
+        onError(error);
+    }
+}
+
 // Object containing utility functions for interacting with the server API
 const api = {
     getUserChannels,
@@ -157,7 +177,8 @@ const api = {
     login,
     getMyProfile,
     getUserFriends,
-    addFriend
+    addFriend,
+    getUserProfile
 }
 
 export default api;

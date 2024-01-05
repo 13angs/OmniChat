@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RelatedUser, UserChannel } from '../../shared/types';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useUserChannel } from '../../shared/customHooks';
@@ -11,8 +11,10 @@ interface UserButtonProps {
     onClick: () => void;
 }
 
+// UserButton component for rendering a button representing an individual user in the UserList
 const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClick }) => {
     const { myProfile } = useMainContainerContext();
+
     // Use custom hook to find friend based on user channel and current user ID
     const friendName = useUserChannel().findFriend(userChannel, myProfile?._id)?.name;
 
@@ -29,26 +31,46 @@ const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClic
 
 // Main UserList component
 interface UserListProps {
-    selectUserChannel: (userChannel: UserChannel) => void;
+    setParam?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const UserList: React.FC<UserListProps> = ({ selectUserChannel }) => {
+// UserList component for rendering the list of user channels and selecting a user channel
+const UserList: React.FC<UserListProps> = ({ setParam }) => {
     // State for managing user channels and selected user channel
     const [userChannels, setUserChannels] = useState<UserChannel[]>([]);
-    const [selectedUserChannel, setSelectedUserChannel] = useState<UserChannel | null>(null);
+    const [relatedUser, setRelatedUser] = useState<RelatedUser | null>(null);
 
     // Context and custom hook for user-related functionality
     const { myProfile } = useMainContainerContext();
     const { findFriend } = useUserChannel();
 
     // Custom hook for fetching user channels
-    useGetUserChannels({ setUserChannels, setSelectedUserChannel })
+    useGetUserChannels({ setUserChannels });
 
-    // Use useMemo to memoize the relatedUser value
-    const relatedUser: RelatedUser | undefined = useMemo(() => {
-        return findFriend(selectedUserChannel ?? undefined, myProfile?._id);
-    }, [findFriend, myProfile?._id, selectedUserChannel]);
+    // Function to select a user channel and update the URL
+    const selectUserChannel = (userChannel: UserChannel): void => {
+        const relUser: RelatedUser | undefined = findFriend(userChannel ?? undefined, myProfile?._id);
 
+        // Update the URL with the user_id
+        const url = new URL(window.location.href);
+        url.searchParams.set('to.user_id', relUser?.user_id ?? "");
+        window.history.pushState({}, '', url.toString());
+
+        // Set the relatedUser state
+        setRelatedUser(relUser ?? null);
+    };
+
+    // Extracting friendUserId from the URL and updating the state using setParam
+    const url = new URL(window.location.href);
+    const friendUserId = url.searchParams.get('to.user_id');
+
+    useEffect(() => {
+        if (setParam) {
+            setParam(friendUserId);
+        }
+    }, [friendUserId, setParam]);
+
+    // Rendering the UserList component
     return (
         <div className="h-screen flex w-1/4 flex-col p-4 border-r">
             <div>
@@ -72,4 +94,5 @@ const UserList: React.FC<UserListProps> = ({ selectUserChannel }) => {
     );
 };
 
+// Exporting the UserList component as the default export
 export default UserList;
