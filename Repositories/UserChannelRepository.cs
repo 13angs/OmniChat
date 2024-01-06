@@ -22,6 +22,19 @@ namespace OmniChat.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<UserChannel>> FindByUserAsync(string providerId, string userId)
+        {
+            var builder = Builders<UserChannel>.Filter;
+            var filter = builder.And(
+                builder.Eq(x => x.ProviderId, providerId),
+                builder.ElemMatch(x => x.RelatedUsers, u => u.UserId == userId)
+            );
+
+            return await _userChannelsCollection
+                .Find(filter)
+                .ToListAsync();
+        }
+
         public async Task<UserChannel> FindRelatedUsersAsync(string from, string to)
         {
 
@@ -41,9 +54,9 @@ namespace OmniChat.Repositories
 
         public async Task ReplaceRelatedUsersAsync(UserChannel userChannel)
         {
-            userChannel.ModifiedTimestamp=DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            userChannel.ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             await _userChannelsCollection
-                .ReplaceOneAsync(x=>x.Id==userChannel.Id, userChannel);
+                .ReplaceOneAsync(x => x.Id == userChannel.Id, userChannel);
         }
     }
 }

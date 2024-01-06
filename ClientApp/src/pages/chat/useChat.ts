@@ -6,6 +6,7 @@ import { RequestParam } from "../../shared/contants";
 
 interface GetUsersProps {
     setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>;
+    queryBy: RequestParam
 }
 
 interface GetMessagesProps {
@@ -101,14 +102,12 @@ const useSignalRUserChannelSelected = ({ connection, userChannels, setSelectedUs
 }
 
 // Custom hook for fetching user_channels and setting the selected user based on the user_id from the URL
-const useGetUserChannels = ({ setUserChannels }: GetUsersProps) => {
+const useGetUserChannels = ({ setUserChannels, queryBy }: GetUsersProps) => {
     const { myProfile } = useMainContainerContext();
 
     // Function to handle successful user data retrieval
     const handleGetUsersSuccess = (response: OkResponse<UserChannelResponse>): void => {
         setUserChannels(response.data.user_channels)
-        console.log(response)
-
         // Set selectedUser based on user_id from the URL
         // const url = new URL(window.location.href);
         // const user_id = url.searchParams.get('to.user_id');
@@ -116,9 +115,12 @@ const useGetUserChannels = ({ setUserChannels }: GetUsersProps) => {
     }
 
     const userChannelRequest: UserChannelRequest = useMemo(() => ({
-        by: RequestParam.provider,
-        provider_id: myProfile?.provider_id
-    }), [myProfile?.provider_id])
+        by: queryBy,
+        provider_id: myProfile?.provider_id,
+        from: {
+            ref_id: myProfile._id
+        }
+    }), [myProfile._id, myProfile?.provider_id, queryBy])
 
     // fetch users when the component mounts
     useEffect(() => {

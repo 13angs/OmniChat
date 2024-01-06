@@ -17,5 +17,17 @@ namespace OmniChat.Handlers
 
             return false;
         }
+        public static bool HandleGetUserChannelsByUser(UserChannelRequest request)
+        {
+            if (request.By == RequestParam.friend &&
+                RequiredPropsHandler.HandleRequiredProps("provider_id", request.ProviderId) &&
+                request.From != null &&
+                RequiredPropsHandler.HandleRequiredProps("from.ref_id", request.From.RefId))
+            {
+                return true;
+            }
+
+            throw new NotImplementedException($"Action not implemented");
+        }
     }
 }

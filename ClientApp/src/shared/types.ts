@@ -96,6 +96,7 @@ export interface UserChannelRequest {
     by?: RequestParam;
     provider_id?: string;
     to?: MessageTo;
+    from?: MessageFrom;
     channel_type?: ChannelType
 }
 export interface MessageRequest {

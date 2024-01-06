@@ -3,6 +3,7 @@ import { RelatedUser, UserChannel, UserChannelRequest } from '../../shared/types
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useUserChannel } from '../../shared/customHooks';
 import { useGetUserChannels } from './useChat';
+import { RequestParam } from '../../shared/contants';
 
 // Component for rendering individual user buttons
 interface UserButtonProps {
@@ -45,7 +46,7 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
     const { findFriend } = useUserChannel();
 
     // Custom hook for fetching user channels
-    useGetUserChannels({ setUserChannels });
+    useGetUserChannels({ setUserChannels, queryBy: RequestParam.friend });
 
     // Function to select a user channel and update the URL
     const selectUserChannel = (userChannel: UserChannel): void => {

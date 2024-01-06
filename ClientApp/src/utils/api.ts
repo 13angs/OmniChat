@@ -1,10 +1,16 @@
+import { RequestParam } from "../shared/contants";
 import { AuthResponse, LoginRequest, Message, MessageRequest, MessageResponse, OkResponse, UserChannelRequest, UserChannelResponse, UserRequest, UserResponse } from "../shared/types";
 
 // fetch users from the server
 async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void, userChannelRequest: UserChannelRequest) {
     try {
+        let endpoint = `api/v1/user/channels?by=${userChannelRequest.by}&provider_id=${userChannelRequest.provider_id}`;
+
+        if (userChannelRequest.by === RequestParam.friend) {
+            endpoint = `api/v1/user/channels?by=${userChannelRequest.by}&provider_id=${userChannelRequest.provider_id}&from.ref_id=${userChannelRequest.from?.ref_id}`;
+        }
         // Fetch users from the 'api/chat/users' endpoint
-        const response = await fetch(`api/v1/user/channels?by=${userChannelRequest.by}&provider_id=${userChannelRequest.provider_id}`);
+        const response = await fetch(endpoint);
         const data = await response.json();
         // Call the onSuccess callback with the retrieved user data
 
@@ -47,8 +53,7 @@ async function sendMessage(onSuccess: (messageResponse: OkResponse<MessageRespon
 
         const data = await response.json();
 
-        if(response.status !== 200)
-        {
+        if (response.status !== 200) {
             throw new Error(data.message)
         }
 
