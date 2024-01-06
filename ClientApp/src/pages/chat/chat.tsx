@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, KeyboardEvent, useMemo } from 'react';
-import { Message, MessageRequest, User, UserRequest } from '../../shared/types';
+import { Message, MessageRequest, User, UserChannelRequest, UserRequest } from '../../shared/types';
 import { useGetMessages, useGetUserProfile } from './useChat';
 import UserList from './userList';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
@@ -84,12 +84,11 @@ const UserChat: React.FC<UserChatProps> = ({ userFriendId }) => {
 };
 
 const ChatPage: React.FC = () => {
-  const [userFriendId, setUserFriendId] = useState<string | null>(null);
-
+  const [userChannelRequest, setUserChannelRequest] = useState<UserChannelRequest | null>(null);
   return (
     <div className="min-h-screen flex">
-      <UserList setParam={setUserFriendId} />
-      {userFriendId && <UserChat userFriendId={userFriendId} />}
+      <UserList setParam={setUserChannelRequest} />
+      {userChannelRequest?.to?.user_id && <UserChat userFriendId={userChannelRequest?.to?.user_id ?? ""} />}
     </div>
   );
 };

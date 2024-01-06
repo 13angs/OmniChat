@@ -6,6 +6,12 @@ export enum RequestParam {
     friend
 }
 
+export enum ChannelType {
+    user,
+    group,
+    platform
+}
+
 export const contants = {
     TOKEN_COOKIE_KEY: 'jwt-token',
     MY_PROFILE_COOKIE_KEY: 'my-profile'

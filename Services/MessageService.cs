@@ -10,33 +10,40 @@ namespace OmniChat.Services
         private readonly IUserFriendRepository _userFriendRepo;
         private readonly IUserChannelRepository _userChannelRepo;
         private readonly IMessageRepository _messageRepo;
+
         public MessageService(IUserFriendRepository userFriendRepo, IUserChannelRepository userChannelRepo, IMessageRepository messageRepo)
         {
             _userFriendRepo = userFriendRepo;
             _userChannelRepo = userChannelRepo;
             _messageRepo = messageRepo;
         }
-        public async Task SendMessageAsync(MessageRequest request)
+
+        // Asynchronously sends a message and returns a response
+        public async Task<OkResponse<string>> SendMessageAsync(MessageRequest request)
         {
+            // Check if the message send action is handled
             if (MessageHandler.HandleSendMessage(request))
             {
-                // find your friend
+                // Find the user friend to whom the message is being sent
                 UserFriend userFriend = await _userFriendRepo.FindFollowedUserAsync(request.To.UserId!, request.From.RefId!);
 
                 if (userFriend == null)
                 {
-                    throw new DataException($"You haven't been friend with {request.To.Name} yet!");
+                    // Throw an exception if the user is not a friend
+                    throw new DataException($"You haven't been friends with {request.To.Name} yet!");
                 }
 
+                // Find the user channel related to the sender and receiver
                 UserChannel userChannel = await _userChannelRepo
                     .FindRelatedUsersAsync(request.From.RefId!, request.To.UserId!);
 
-                // reset to is_read=true
+                // Reset the 'is_read' property to true for all related users
                 foreach (var relatedUser in userChannel.RelatedUsers)
                 {
                     relatedUser.IsRead = true;
                 }
 
+                // Set 'is_read' to false for the target user
                 foreach (var relatedUser in userChannel.RelatedUsers)
                 {
                     if (relatedUser.UserId == request.To.UserId)
@@ -45,9 +52,11 @@ namespace OmniChat.Services
                     }
                 }
 
+                // Save the updated user channel
                 await _userChannelRepo.ReplaceRelatedUsersAsync(userChannel);
 
-                Message newMessage = new Message
+                // Create a new message object
+                Message newMessage = new()
                 {
                     Platform = request.Platform,
                     ProviderId = request.ProviderId,
@@ -59,20 +68,34 @@ namespace OmniChat.Services
                     User = request.To
                 };
 
+                // Insert the message into the repository
                 await _messageRepo.InsertOneAsync(newMessage);
-            }
-        }
-    
-        public MessageResponse GetMessages(MessageRequest request)
-        {
-            // get messages for by=user
-            if(MessageHandler.HandleGetMessages(request))
-            {
-                return new MessageResponse{
-                    Messages=_messageRepo.FindMessagesByUserId(request)
+
+                // Return a success response
+                return new OkResponse<string>
+                {
+                    Message = $"Message sent to: {request.To.Name}"
                 };
             }
 
+            // Throw an exception if the action is not implemented
+            throw new NotImplementedException("Action not implemented");
+        }
+    
+        // Retrieves messages based on a given request
+        public MessageResponse GetMessages(MessageRequest request)
+        {
+            // Check if the get messages action is handled
+            if(MessageHandler.HandleGetMessages(request))
+            {
+                // Return a response with the messages found for the user
+                return new MessageResponse
+                {
+                    Messages = _messageRepo.FindMessagesByUserId(request)
+                };
+            }
+
+            // Throw an exception if the query is not implemented
             throw new NotImplementedException("Query is not implemented");
         }
     }

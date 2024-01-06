@@ -1,4 +1,4 @@
-import { RequestParam } from "./contants";
+import { ChannelType, RequestParam } from "./contants";
 
 export interface User {
     _id: string;
@@ -69,7 +69,7 @@ export interface UserChannelResponse {
     user_channels: UserChannel[]
 }
 export interface MessageResponse {
-    messages: Message[]
+    messages: Message[];
 }
 export interface AuthResponse {
     token: string
@@ -95,9 +95,12 @@ export interface UserRequest {
 export interface UserChannelRequest {
     by?: RequestParam;
     provider_id?: string;
+    to?: MessageTo;
+    channel_type?: ChannelType
 }
 export interface MessageRequest {
-    by?: RequestParam; 
+    by?: RequestParam;
+    channel_type?: ChannelType; 
     provider_id?: string;
     from?: MessageFrom;
     to?: MessageTo;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RelatedUser, UserChannel } from '../../shared/types';
+import { RelatedUser, UserChannel, UserChannelRequest } from '../../shared/types';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useUserChannel } from '../../shared/customHooks';
 import { useGetUserChannels } from './useChat';
@@ -31,7 +31,7 @@ const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClic
 
 // Main UserList component
 interface UserListProps {
-    setParam?: React.Dispatch<React.SetStateAction<string | null>>;
+    setParam?: React.Dispatch<React.SetStateAction<UserChannelRequest | null>>;
 }
 
 // UserList component for rendering the list of user channels and selecting a user channel
@@ -54,6 +54,7 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
         // Update the URL with the user_id
         const url = new URL(window.location.href);
         url.searchParams.set('to.user_id', relUser?.user_id ?? "");
+        url.searchParams.set('channel_type', userChannel.channel_type ?? "");
         window.history.pushState({}, '', url.toString());
 
         // Set the relatedUser state
@@ -63,12 +64,19 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
     // Extracting friendUserId from the URL and updating the state using setParam
     const url = new URL(window.location.href);
     const friendUserId = url.searchParams.get('to.user_id');
+    const channelType = url.searchParams.get('channel_type');
 
     useEffect(() => {
         if (setParam) {
-            setParam(friendUserId);
+            setParam((prev) => ({
+                ...prev,
+                to: {
+                    user_id: friendUserId ?? ""
+                },
+                channel_type: Number(channelType)
+            }));
         }
-    }, [friendUserId, setParam]);
+    }, [channelType, friendUserId, setParam]);
 
     // Rendering the UserList component
     return (
