@@ -5,7 +5,7 @@ import UserList from './userList';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import Avatar from '../../components/avatar/avatar';
 import api from '../../utils/api';
-import { MessageTypeService } from '../../utils/service';
+import { MessageTypeService, UserChannelService } from '../../utils/service';
 
 interface UserChatProps {
   // userFriendId: string | null;
@@ -81,16 +81,27 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
           avatar={userProfile.avatar ?? ""}
         />
       )}
-      <div className="flex-1 overflow-y-scroll">
+      <div className="border-b" />
+      <div className="flex-1 overflow-y-scroll mt-2">
         {messages.map((message) => (
-          <div key={message._id} className="bg-gray-200 p-2 rounded mb-2">
-            {message.message_object?.map((messageObject: any) => (
-              <p key={`${messageObject?.text}`} className="text-gray-800">
-                {messageObject?.text}
-              </p>
-            ))}
+          <div key={message._id} className='flex items-start mb-1'>
+            <Avatar
+              name={message?.from?.name ?? ""}
+              avatar={message?.from?.avatar ?? ""}
+              displayName={false}
+            />
+            <div className={`flex items-center p-2 ml-2 rounded ${UserChannelService
+              .displayUsertMessage(message, myProfile, userChannelRequest?.to, 'bg-gray-200', 'bg-blue-500 text-white')}`}>
+              {message.message_object?.map((messageObject: any) => (
+                <p key={`${messageObject?.text}`} className={UserChannelService
+                  .displayUsertMessage(message, myProfile, userChannelRequest?.to, "text-gray-800", 'white')}>
+                  {messageObject?.text}
+                </p>
+              ))}
+            </div>
           </div>
         ))}
+
       </div>
       <div className="flex items-center">
         <input

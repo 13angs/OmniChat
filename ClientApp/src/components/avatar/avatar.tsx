@@ -5,11 +5,12 @@ interface AvatarProps {
   avatar: string | null;
   width?: number;
   height?: number;
+  displayName?: boolean
 }
 
-const Avatar: React.FC<AvatarProps> = ({ name, avatar, width=100, height=100 }) => {
+const Avatar: React.FC<AvatarProps> = ({ name, avatar, width = 100, height = 100, displayName = true }) => {
   return (
-    <div className="border-b">
+    <div>
       <div className="w-12 h-12 rounded-full mb-2 overflow-hidden">
         {/* Use the Image component from next/image */}
         {avatar ? (
@@ -28,7 +29,9 @@ const Avatar: React.FC<AvatarProps> = ({ name, avatar, width=100, height=100 }) 
           </div>
         )}
       </div>
-      <p className="text-xl font-semibold">{name}</p>
+      {displayName && (
+        <p className="text-xl font-semibold">{name}</p>
+      )}
     </div>
   );
 };
