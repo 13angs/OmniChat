@@ -35,8 +35,7 @@ namespace OmniChat.Controllers
         [Route("message/send")]
         public async Task<ActionResult> SendMessageAsync([FromBody] MessageRequest request)
         {
-            await _messageService.SendMessageAsync(request);
-            return Ok();
+            return Ok(await _messageService.SendMessageAsync(request));
         }
     }
 }

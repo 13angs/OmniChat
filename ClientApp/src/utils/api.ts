@@ -52,6 +52,8 @@ async function sendMessage(onSuccess: (messageResponse: OkResponse<MessageRespon
             throw new Error(data.message)
         }
 
+        onSuccess(data);
+
     } catch (error) {
         // Call the onError callback in case of an error during message data retrieval
         onError(error);

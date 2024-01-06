@@ -1,15 +1,18 @@
 import React, { useState, ChangeEvent, KeyboardEvent, useMemo } from 'react';
-import { Message, MessageRequest, User, UserChannelRequest, UserRequest } from '../../shared/types';
+import { Message, MessageRequest, MessageResponse, OkResponse, User, UserChannelRequest, UserRequest } from '../../shared/types';
 import { useGetMessages, useGetUserProfile } from './useChat';
 import UserList from './userList';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import Avatar from '../../components/avatar/avatar';
+import api from '../../utils/api';
+import { MessageTypeService } from '../../utils/service';
 
 interface UserChatProps {
-  userFriendId: string | null;
+  // userFriendId: string | null;
+  userChannelRequest: UserChannelRequest | null
 }
 
-const UserChat: React.FC<UserChatProps> = ({ userFriendId }) => {
+const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   const { myProfile } = useMainContainerContext();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
@@ -22,16 +25,16 @@ const UserChat: React.FC<UserChatProps> = ({ userFriendId }) => {
         ref_id: myProfile._id
       },
       to: {
-        user_id: userFriendId ?? ""
+        user_id: userChannelRequest?.to?.user_id ?? ""
       }
     };
-  }, [myProfile.provider_id, myProfile._id, userFriendId]);
+  }, [myProfile.provider_id, myProfile._id, userChannelRequest?.to?.user_id]);
 
   const userRequest: UserRequest = useMemo(() => {
     return {
-      user_id: userFriendId ?? ""
+      user_id: userChannelRequest?.to?.user_id ?? ""
     };
-  }, [userFriendId]);
+  }, [userChannelRequest?.to?.user_id]);
 
   useGetUserProfile({ setUserProfile, userRequest });
   useGetMessages({ setMessages, messageRequest });
@@ -40,11 +43,34 @@ const UserChat: React.FC<UserChatProps> = ({ userFriendId }) => {
     if (e.key === 'Enter') {
       console.log('Enter key pressed');
       // Add logic to send the message
+      handleSendMessage();
     }
   };
 
+  const handleSuccessSendMessage = (messageResponse: OkResponse<MessageResponse>) => {
+    setNewMessage('');
+  }
+
   const handleSendMessage = () => {
     // Add logic to send the message
+
+    const sendMessageRequest: MessageRequest = {
+      channel_type: userChannelRequest?.channel_type,
+      provider_id: myProfile?.provider_id,
+      from: {
+        ref_id: myProfile._id,
+        name: myProfile.name,
+        avatar: myProfile.avatar ?? ""
+      },
+      to: {
+        user_id: userProfile?._id,
+        name: userProfile?.name,
+        avatar: userProfile?.avatar ?? ""
+      },
+      message_object: MessageTypeService.getTextMessage(newMessage)
+    }
+
+    api.sendMessage(handleSuccessSendMessage, (error) => { alert(error) }, sendMessageRequest);
   };
 
   return (
@@ -88,7 +114,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       <UserList setParam={setUserChannelRequest} />
-      {userChannelRequest?.to?.user_id && <UserChat userFriendId={userChannelRequest?.to?.user_id ?? ""} />}
+      {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest} />}
     </div>
   );
 };

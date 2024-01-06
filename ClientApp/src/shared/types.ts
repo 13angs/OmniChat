@@ -104,4 +104,12 @@ export interface MessageRequest {
     provider_id?: string;
     from?: MessageFrom;
     to?: MessageTo;
+    message_object?: any
 }
+
+// message types
+export interface TextMessage {
+    type: string;
+    text: string;
+}
+
