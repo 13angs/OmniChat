@@ -80,9 +80,9 @@ const FriendsPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className='flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)] flex-col'>
       <h1 className="text-3xl font-bold mt-4 mb-4">Friends Page</h1>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 overflow-y-scroll">
         {friends.map((friend) => (
           <div key={friend._id} className="bg-gray-200 p-4 rounded">
             <Avatar name={friend.name} avatar={friend.avatar} />
@@ -106,7 +106,7 @@ const FriendsPage: React.FC = () => {
         onConfirm={confirmAddFriend}
         onCancel={cancelAddFriend}
       />
-    </>
+    </div>
   );
 };
 

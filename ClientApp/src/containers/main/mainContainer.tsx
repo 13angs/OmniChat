@@ -64,12 +64,12 @@ const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
                 <Drawer isOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
 
                 {/* Main Content */}
-                <div className="flex-grow p-4">
-                    <div className={`flex-grow transition-all duration-300 w-full`}>
-                        {/* Menu Icon */}
-                        <button className="cursor-pointer" onClick={toggleDrawer}>
-                            <Menu size={24} />
-                        </button>
+                <div className="flex-grow p-4 transition-all duration-300 w-full">
+                    {/* Menu Icon */}
+                    <button className="cursor-pointer" onClick={toggleDrawer}>
+                        <Menu size={24} />
+                    </button>
+                    <div className={`flex-grow`}>
                         {/* Your main content goes here */}
                         {children}
                     </div>

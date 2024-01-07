@@ -42,7 +42,7 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
     const [relatedUser, setRelatedUser] = useState<RelatedUser | null>(null);
 
     // Context and custom hook for user-related functionality
-    const { myProfile } = useMainContainerContext();
+    const { myProfile, isDrawerOpen } = useMainContainerContext();
     const { findFriend } = useUserChannel();
 
     // Custom hook for fetching user channels
@@ -81,7 +81,7 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
 
     // Rendering the UserList component
     return (
-        <div className="h-screen flex w-1/4 flex-col p-4 border-r">
+        <div className={`h-full flex ${isDrawerOpen ? 'w-1/4' : 'w-1/5'} flex-col border-r min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]`}>
             <div>
                 <h2 className="text-xl font-semibold mb-4">Users</h2>
                 <p className="mb-2">

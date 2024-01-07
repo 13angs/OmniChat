@@ -144,6 +144,9 @@ const useGetMessages = ({ setMessages, messageRequest }: GetMessagesProps) => {
             from: messageRequest.from,
             to: messageRequest.to
         }
+
+        // reset the messages
+        setMessages([]);
         api.getMessages(handleGetMessagesSuccess, (error) => { console.error('Error fetching messages:', error); }, params)
 
     }, [messageRequest, setMessages])

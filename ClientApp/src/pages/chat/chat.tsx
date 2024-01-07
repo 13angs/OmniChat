@@ -74,7 +74,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   };
 
   return (
-    <div className="flex-1 p-4 max-h-screen overflow-y-scroll flex flex-col">
+    <div className="flex-1 p-4 flex flex-col">
       {userProfile && (
         <Avatar
           name={userProfile.name ?? ""}
@@ -123,7 +123,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
 const ChatPage: React.FC = () => {
   const [userChannelRequest, setUserChannelRequest] = useState<UserChannelRequest | null>(null);
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]">
       <UserList setParam={setUserChannelRequest} />
       {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest} />}
     </div>
