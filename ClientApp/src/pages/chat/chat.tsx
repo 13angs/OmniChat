@@ -20,15 +20,15 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {
-      provider_id: myProfile.provider_id,
+      provider_id: myProfile?.provider_id,
       from: {
-        ref_id: myProfile._id
+        ref_id: myProfile?._id
       },
       to: {
         user_id: userChannelRequest?.to?.user_id ?? ""
       }
     };
-  }, [myProfile.provider_id, myProfile._id, userChannelRequest?.to?.user_id]);
+  }, [myProfile?.provider_id, myProfile?._id, userChannelRequest?.to?.user_id]);
 
   const userRequest: UserRequest = useMemo(() => {
     return {
@@ -58,9 +58,9 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
       channel_type: userChannelRequest?.channel_type,
       provider_id: myProfile?.provider_id,
       from: {
-        ref_id: myProfile._id,
-        name: myProfile.name,
-        avatar: myProfile.avatar ?? ""
+        ref_id: myProfile?._id,
+        name: myProfile?.name,
+        avatar: myProfile?.avatar ?? ""
       },
       to: {
         user_id: userProfile?._id,

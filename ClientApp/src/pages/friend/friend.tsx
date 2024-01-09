@@ -23,10 +23,10 @@ const FriendsPage: React.FC = () => {
     setFriends(userFriend.data.users)
   }
   const getUserFriendsRequest: UserRequest = useMemo(() => ({
-    provider_id: myProfile.provider_id,
-    user_id: myProfile._id,
+    provider_id: myProfile?.provider_id,
+    user_id: myProfile?._id,
     current_status: current_status ?? "unfollow"
-  }), [current_status, myProfile._id, myProfile.provider_id])
+  }), [current_status, myProfile?._id, myProfile?.provider_id])
 
   useEffect(() => {
     api.getUserFriends(handleGetUserFriendsSuccess, (error) => { alert(error) }, getUserFriendsRequest)
@@ -42,9 +42,9 @@ const FriendsPage: React.FC = () => {
       const userRequest: UserRequest = {
         provider_id: selectedFriend.provider_id,
         from: {
-          ref_id: myProfile._id,
-          name: myProfile.name,
-          avatar: myProfile.avatar ?? ""
+          ref_id: myProfile?._id,
+          name: myProfile?.name,
+          avatar: myProfile?.avatar ?? ""
         },
         to: {
           user_id: selectedFriend._id,

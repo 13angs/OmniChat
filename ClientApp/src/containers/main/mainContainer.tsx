@@ -13,12 +13,12 @@ import Navbar from '../../components/navbar/navbar';
 interface MainContainerContextProps {
     isDrawerOpen: boolean;
     toggleDrawer: () => void;
-    myProfile: User
+    myProfile?: User | null;
 }
 
 const MainContainerContext = createContext<MainContainerContextProps | undefined>(undefined);
 
-export const useMainContainerContext = () => {
+export const useMainContainerContext = (): MainContainerContextProps => {
     const context = useContext(MainContainerContext);
     if (!context) {
         throw new Error('useMainContainerContext must be used within a MainContainerProvider');
@@ -31,9 +31,8 @@ interface MainContainerProps {
 }
 
 const myProfileOptions: CookieOptions = {
-    key: contants.MY_PROFILE_COOKIE_KEY
+    key: contants.MY_PROFILE_COOKIE_KEY,
 };
-
 
 const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -43,19 +42,20 @@ const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
     const toggleDrawer = () => {
         setIsDrawerOpen((prevIsOpen) => !prevIsOpen);
     };
-
-    const obj = useMemo(() => {
-        if (cookieValue) {
-            return { isDrawerOpen, toggleDrawer, myProfile: JSON.parse(cookieValue ?? "") }
-        }
-        return { isDrawerOpen, toggleDrawer, myProfile: null }
-    }, [cookieValue, isDrawerOpen])
-
+    
+    const obj = useMemo(() => ({
+        isDrawerOpen,
+        toggleDrawer,
+        myProfile: cookieValue ? JSON.parse(cookieValue) : null,
+    }), [cookieValue, isDrawerOpen]);
+    
     useEffect(() => {
         if (!cookieValue) {
+            // Redirect to login page if no cookieValue
             navigate(AppRoutes.login.path);
         }
-    }, [cookieValue, navigate])
+    }, [cookieValue, navigate]);
+
 
     return (
         <MainContainerContext.Provider value={obj}>
@@ -71,7 +71,6 @@ const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
                         {children}
                     </div>
                 </div>
-
             </div>
         </MainContainerContext.Provider>
     );

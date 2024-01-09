@@ -118,9 +118,9 @@ const useGetUserChannels = ({ setUserChannels, queryBy }: GetUsersProps) => {
         by: queryBy,
         provider_id: myProfile?.provider_id,
         from: {
-            ref_id: myProfile._id
+            ref_id: myProfile?._id
         }
-    }), [myProfile._id, myProfile?.provider_id, queryBy])
+    }), [myProfile?._id, myProfile?.provider_id, queryBy])
 
     // fetch users when the component mounts
     useEffect(() => {
