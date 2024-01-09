@@ -2,12 +2,12 @@
 
 import React, { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import Drawer from '../../components/drawer/drawer';
-import { Menu } from 'react-feather';
 import { CookieOptions, useCookie } from '../../shared/customHooks';
 import { contants } from '../../shared/contants';
 import { User } from '../../shared/types'
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from '../../AppRoutes';
+import Navbar from '../../components/navbar/navbar';
 
 // Create a context with initial state
 interface MainContainerContextProps {
@@ -63,17 +63,15 @@ const MainContainer: React.FC<MainContainerProps> = ({ children }) => {
                 {/* Drawer Component */}
                 <Drawer isOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
 
-                {/* Main Content */}
-                <div className="flex-grow p-4 transition-all duration-300 w-full">
-                    {/* Menu Icon */}
-                    <button className="cursor-pointer" onClick={toggleDrawer}>
-                        <Menu size={24} />
-                    </button>
-                    <div className={`flex-grow`}>
+                <div className='flex flex-col flex-grow '>
+                    <Navbar />
+                    {/* Main Content */}
+                    <div className="flex-grow p-4 transition-all duration-300 w-full">
                         {/* Your main content goes here */}
                         {children}
                     </div>
                 </div>
+
             </div>
         </MainContainerContext.Provider>
     );

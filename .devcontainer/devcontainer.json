@@ -15,7 +15,8 @@
 				"kreativ-software.csharpextensions",
 				"mongodb.mongodb-vscode",
 				"ms-dotnettools.csdevkit",
-				"SonarSource.sonarlint-vscode"
+				"SonarSource.sonarlint-vscode",
+				"bradlc.vscode-tailwindcss"
 			]
 		}
 	}
