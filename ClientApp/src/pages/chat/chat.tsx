@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, KeyboardEvent, useMemo } from 'react';
+import React, { useState, ChangeEvent, KeyboardEvent, useMemo, useEffect } from 'react';
 import { Message, MessageRequest, MessageResponse, OkResponse, User, UserChannelRequest, UserRequest } from '../../shared/types';
 import { useGetMessages, useGetUserProfile } from './useChat';
 import UserList from './userList';
@@ -6,6 +6,45 @@ import { useMainContainerContext } from '../../containers/main/mainContainer';
 import Avatar from '../../components/avatar/avatar';
 import api from '../../utils/api';
 import { MessageTypeService, UserChannelService } from '../../utils/service';
+import { useInitSignalR } from '../../shared/customHooks';
+import { HubConnection } from '@microsoft/signalr';
+import websocket from '../../utils/websocket';
+
+interface RealtimeMessageProps {
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+}
+
+const useRealtimeMessage = ({ setMessages }: RealtimeMessageProps) => {
+  const [connection, setConnection] = useState<HubConnection | null>(null);
+
+  useInitSignalR({ setConnection, hubConnection: websocket.chatWebsocket });
+
+  useEffect(() => {
+    if (!connection) return;
+
+    // Start SignalR connection
+    connection.start().catch((err) => console.error('SignalR connection error:', err));
+
+    // Subscribe to ReceiveMessage event
+    connection.on('ReceiveMessage', (strMessage) => {
+      // Handle incoming message
+      const message: Message = JSON.parse(strMessage);
+
+      setMessages((prevMessages) => {
+        if (prevMessages.some((item) => item.created_timestamp === message.created_timestamp)) {
+          return prevMessages;
+        }
+        return [...prevMessages, message];
+      });
+    });
+
+    return () => {
+      // Stop SignalR connection when component unmounts
+      connection.stop();
+    };
+    // eslint-disable-next-line
+  }, [connection]);
+}
 
 interface UserChatProps {
   // userFriendId: string | null;
@@ -17,6 +56,8 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [userProfile, setUserProfile] = useState<User | null>(null);
+
+  useRealtimeMessage({ setMessages });
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {

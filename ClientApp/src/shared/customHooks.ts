@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { RelatedUser, UserChannel } from './types';
+import { HubConnection } from '@microsoft/signalr';
 
 export interface CookieOptions extends Cookies.CookieAttributes {
   key: string;
@@ -39,3 +40,24 @@ export const useUserChannel = () => {
     findFriend
   }
 }
+
+export interface InitSignalRProps {
+  setConnection: React.Dispatch<React.SetStateAction<signalR.HubConnection | null>>;
+  hubConnection: HubConnection;
+  
+}
+
+export const useInitSignalR = ({ setConnection, hubConnection }: InitSignalRProps): void => {
+  useEffect(() => {
+    // Initialize SignalR connection
+    const newConnection = hubConnection;
+
+    setConnection(newConnection);
+
+    return () => {
+      // Cleanup for the SignalR connection when component unmounts
+      newConnection.stop();
+    };
+    // eslint-disable-next-line
+  }, []);
+};

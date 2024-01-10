@@ -1,5 +1,8 @@
 using System.Data;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using OmniChat.Handlers;
+using OmniChat.Hubs;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -10,12 +13,14 @@ namespace OmniChat.Services
         private readonly IUserFriendRepository _userFriendRepo;
         private readonly IUserChannelRepository _userChannelRepo;
         private readonly IMessageRepository _messageRepo;
+        private readonly IHubContext<ChatHub> _chatHubContext;
 
-        public MessageService(IUserFriendRepository userFriendRepo, IUserChannelRepository userChannelRepo, IMessageRepository messageRepo)
+        public MessageService(IUserFriendRepository userFriendRepo, IUserChannelRepository userChannelRepo, IMessageRepository messageRepo, IHubContext<ChatHub> chatHubContext)
         {
             _userFriendRepo = userFriendRepo;
             _userChannelRepo = userChannelRepo;
             _messageRepo = messageRepo;
+            _chatHubContext = chatHubContext;
         }
 
         // Asynchronously sends a message and returns a response
@@ -71,6 +76,9 @@ namespace OmniChat.Services
                 // Insert the message into the repository
                 await _messageRepo.InsertOneAsync(newMessage);
 
+                // Notify clients about the new message using SignalR
+                await _chatHubContext.Clients.All.SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
+
                 // Return a success response
                 return new OkResponse<string>
                 {
@@ -81,12 +89,12 @@ namespace OmniChat.Services
             // Throw an exception if the action is not implemented
             throw new NotImplementedException("Action not implemented");
         }
-    
+
         // Retrieves messages based on a given request
         public MessageResponse GetMessages(MessageRequest request)
         {
             // Check if the get messages action is handled
-            if(MessageHandler.HandleGetMessages(request))
+            if (MessageHandler.HandleGetMessages(request))
             {
                 // Return a response with the messages found for the user
                 return new MessageResponse
