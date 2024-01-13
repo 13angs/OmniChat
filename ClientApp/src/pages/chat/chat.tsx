@@ -39,8 +39,8 @@ const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) =
           console.log(message);
           setMessages((prevMessages) => {
 
-            if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) || 
-                (item.user_channel_id !== message.user_channel_id))) {
+            if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) ||
+              (item.user_channel_id !== message.user_channel_id))) {
               return prevMessages;
             }
             return [...prevMessages, message];
@@ -140,8 +140,8 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
         />
       )}
       <div className="border-b" />
-      <div className="flex-1 overflow-y-scroll mt-2">
-        {messages.map((message) => (
+      <div className="flex-1 overflow-y-scroll mt-2 flex flex-col-reverse">
+        {messages.slice().reverse().map((message) => (
           <div key={message._id} className='flex items-start mb-1'>
             <Avatar
               name={message?.from?.name ?? ""}
@@ -159,7 +159,6 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
             </div>
           </div>
         ))}
-
       </div>
       <div className="flex items-center">
         <input
