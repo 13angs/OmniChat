@@ -9,6 +9,7 @@ import { MessageTypeService, UserChannelService } from '../../utils/service';
 import { useInitSignalR } from '../../shared/customHooks';
 import websocket from '../../utils/websocket';
 import * as signalR from '@microsoft/signalr';
+import moment from 'moment'
 
 interface RealtimeMessageProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
@@ -148,14 +149,17 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
               avatar={message?.from?.avatar ?? ""}
               displayName={false}
             />
-            <div className={`flex items-center p-2 ml-2 rounded ${UserChannelService
-              .displayUsertMessage(message, myProfile, userChannelRequest?.to, 'bg-gray-200', 'bg-blue-500 text-white')}`}>
-              {message.message_object?.map((messageObject: any) => (
-                <p key={`${messageObject?.text}`} className={UserChannelService
-                  .displayUsertMessage(message, myProfile, userChannelRequest?.to, "text-gray-800", 'white')}>
-                  {messageObject?.text}
-                </p>
-              ))}
+            <div className='flex flex-col'>
+              <p>{moment(message.created_timestamp).format("DD MMM YYYY")}</p>
+              <div className={`flex items-center p-2 ml-2 rounded ${UserChannelService
+                .displayUsertMessage(message, myProfile, userChannelRequest?.to, 'bg-gray-200', 'bg-blue-500 text-white')}`}>
+                {message.message_object?.map((messageObject: any) => (
+                  <p key={`${messageObject?.text}`} className={UserChannelService
+                    .displayUsertMessage(message, myProfile, userChannelRequest?.to, "text-gray-800", 'white')}>
+                    {messageObject?.text}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
         ))}
