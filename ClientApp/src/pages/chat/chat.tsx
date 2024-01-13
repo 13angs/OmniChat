@@ -143,15 +143,23 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
       <div className="border-b" />
       <div className="flex-1 overflow-y-scroll mt-2 flex flex-col-reverse">
         {messages.slice().reverse().map((message) => (
-          <div key={message._id} className='flex items-start mb-1'>
+          <div key={message._id} className='flex items-start mb-4'>
+            {/* User Avatar */}
             <Avatar
               name={message?.from?.name ?? ""}
               avatar={message?.from?.avatar ?? ""}
               displayName={false}
             />
-            <div className='flex flex-col'>
-              <p>{moment(message.created_timestamp).format("DD MMM YYYY")}</p>
-              <div className={`flex items-center p-2 ml-2 rounded ${UserChannelService
+
+            {/* Message Content */}
+            <div className='flex flex-col ml-3'>
+              {/* Timestamp */}
+              <p className="text-xs text-gray-500 mb-1">
+                {moment(message.created_timestamp).format("DD MMM YYYY")}
+              </p>
+
+              {/* Message Body */}
+              <div className={`flex items-center p-2 rounded ${UserChannelService
                 .displayUsertMessage(message, myProfile, userChannelRequest?.to, 'bg-gray-200', 'bg-blue-500 text-white')}`}>
                 {message.message_object?.map((messageObject: any) => (
                   <p key={`${messageObject?.text}`} className={UserChannelService
