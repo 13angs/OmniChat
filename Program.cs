@@ -21,11 +21,11 @@ var configuration = builder.Configuration;
 Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .WriteTo.File(Path.Combine(builder.Environment.ContentRootPath, "Logs/log.txt"), 
+            .WriteTo.File(Path.Combine(builder.Environment.ContentRootPath, "Logs/log.txt"),
                 rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-builder.Host.UseSerilog(); 
+builder.Host.UseSerilog();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,6 +52,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -63,6 +64,24 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = configuration["Jwt:Issuer"],            // Replace with your issuer
         ValidAudience = configuration["Jwt:Audience"],        // Replace with your audience
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!))  // Replace with your secret key
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            // If the request is for our hub...
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/hub/chat")))
+            {
+                // Read the token out of the query string
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddSingleton<IJwtService, JwtService>();
@@ -92,6 +111,8 @@ app.UseExceptionHandlerMiddleware();
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.MapControllerRoute(

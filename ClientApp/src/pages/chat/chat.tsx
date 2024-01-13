@@ -31,13 +31,12 @@ const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) =
         await connection.start();
 
         // Add the user to a group (you might want to customize the group name)
-        await connection.invoke("AddToProvider", providerId);
+        await connection.invoke("AddToProvider");
 
         // Subscribe to ReceiveMessage event
         connection.on('ReceiveMessageFromProvider', (strMessage) => {
           // Handle incoming message
           const message: Message = JSON.parse(strMessage);
-          console.log(message);
           setMessages((prevMessages) => {
 
             if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) ||
@@ -48,7 +47,7 @@ const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) =
           });
         });
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     }
 
@@ -57,6 +56,8 @@ const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) =
     return () => {
       // Stop SignalR connection when component unmounts
       if (connection?.state === signalR.HubConnectionState.Connected) {
+        // Remove the user from the group
+        connection.invoke("RemoveFromProvider");
         connection.stop();
       }
     };

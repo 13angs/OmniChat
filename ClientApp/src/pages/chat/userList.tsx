@@ -15,9 +15,10 @@ interface UserButtonProps {
 // UserButton component for rendering a button representing an individual user in the UserList
 const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClick }) => {
     const { myProfile } = useMainContainerContext();
+    const { findFriend } = useUserChannel();
 
     // Use custom hook to find friend based on user channel and current user ID
-    const friendName = useUserChannel().findFriend(userChannel, myProfile?._id)?.name;
+    const friendProps = findFriend(userChannel, myProfile?._id);
 
     return (
         <button
@@ -25,7 +26,13 @@ const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClic
             style={{ width: '100%', textAlign: 'left' }}
             onClick={onClick}
         >
-            {friendName}
+            <div className='flex justify-center items-center'>
+                <p className='flex-grow'>{friendProps?.name}</p>
+
+                {friendProps?.is_read && (
+                    <div className='w-2 h-2 bg-green-500 rounded-xl' />
+                )}
+            </div>
         </button>
     );
 };

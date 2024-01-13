@@ -11,6 +11,10 @@ namespace OmniChat.Services
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private const string expireInMonths = "MONTH";
+        private const string expireInDays = "DAY";
+        private const string expireInHours = "HOUR";
+        private const string expireInMinutes = "MINUTE";
         public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -23,15 +27,41 @@ namespace OmniChat.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("user_id", user.Id),
+                    new("provider_id", user.ProviderId),
+                    new("user_id", user.Id),
                     // Add additional claims if needed
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"],
+                Expires = GetExpireTime(),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        private DateTime GetExpireTime()
+        {
+            _ = int.TryParse(_configuration["Jwt:Expires:Value"], out int expireValue);
+
+            if (_configuration["Jwt:Expires:Type"] == expireInMonths)
+            {
+                return DateTime.UtcNow.AddDays(expireValue);
+            }
+            else if (_configuration["Jwt:Expires:Type"] == expireInDays)
+            {
+                return DateTime.UtcNow.AddDays(expireValue);
+            }
+            else if (_configuration["Jwt:Expires:Type"] == expireInHours)
+            {
+                return DateTime.UtcNow.AddHours(expireValue);
+            }
+            else if (_configuration["Jwt:Expires:Type"] == expireInMinutes)
+            {
+                return DateTime.UtcNow.AddMinutes(expireValue);
+            }
+            return DateTime.UtcNow.AddDays(expireValue);
         }
 
         public JwtPayloadData DecodeJwtPayloadData(string token)
