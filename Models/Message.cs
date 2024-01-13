@@ -18,6 +18,10 @@ namespace OmniChat.Models
         [JsonProperty("channel_id")]
         public string? ChannelId { get; set; }
 
+        [BsonElement("user_channel_id")]
+        [JsonProperty("user_channel_id")]
+        public string? UserChannelId { get; set; }
+
         [BsonElement("channel_type")]
         [JsonProperty("channel_type")]
         public required ChannelType ChannelType { get; set; }
@@ -48,7 +52,7 @@ namespace OmniChat.Models
         [JsonProperty("provider_id")]
         [FromQuery(Name = "provider_id")]
         public required string ProviderId { get; set; }
-        
+
         [BsonElement("platform")]
         [JsonProperty("platform")]
         public required Platform Platform { get; set; }
@@ -63,7 +67,7 @@ namespace OmniChat.Models
         [BsonElement("message_exchange")]
         [JsonProperty("message_exchange")]
         public required MessageExchange MessageExchange { get; set; }
-        
+
         [BsonElement("message_object")]
         [JsonProperty("message_object")]
         public required object MessageObject { get; set; }
@@ -124,7 +128,7 @@ namespace OmniChat.Models
     {
         public MessageResponse()
         {
-            Messages=new List<Message>();
+            Messages = new List<Message>();
         }
 
         [JsonProperty("messages")]

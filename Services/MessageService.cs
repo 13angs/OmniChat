@@ -27,7 +27,7 @@ namespace OmniChat.Services
         public async Task<OkResponse<string>> SendMessageAsync(MessageRequest request)
         {
             // Check if the message send action is handled
-            if (MessageHandler.HandleSendMessage(request))
+            if (MessageHandler.HandleSendUserMessage(request))
             {
                 // Find the user friend to whom the message is being sent
                 UserFriend userFriend = await _userFriendRepo.FindFollowedUserAsync(request.To.UserId!, request.From.RefId!);
@@ -66,6 +66,7 @@ namespace OmniChat.Services
                     Platform = request.Platform,
                     ProviderId = request.ProviderId,
                     ChannelType = request.ChannelType,
+                    UserChannelId = userChannel.Id,
                     OperationMode = request.OperationMode,
                     MessageExchange = request.MessageExchange,
                     MessageObject = request.MessageObject,
@@ -77,7 +78,7 @@ namespace OmniChat.Services
                 await _messageRepo.InsertOneAsync(newMessage);
 
                 // Notify clients about the new message using SignalR
-                await _chatHubContext.Clients.All.SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
+                await _chatHubContext.Clients.Group(newMessage.ProviderId).SendAsync("ReceiveMessageFromProvider", JsonConvert.SerializeObject(newMessage));
 
                 // Return a success response
                 return new OkResponse<string>

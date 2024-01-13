@@ -52,6 +52,7 @@ export interface Message {
     platform?: string; // Assuming this is an enum
     provider_id?: string;
     channel_id?: string;
+    user_channel_id?: string;
     channel_type?: string; // Assuming this is an enum
     operation_mode?: string; // Assuming this is an enum
     message_exchange?: string; // Assuming this is an enum

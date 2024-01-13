@@ -7,40 +7,57 @@ import Avatar from '../../components/avatar/avatar';
 import api from '../../utils/api';
 import { MessageTypeService, UserChannelService } from '../../utils/service';
 import { useInitSignalR } from '../../shared/customHooks';
-import { HubConnection } from '@microsoft/signalr';
 import websocket from '../../utils/websocket';
+import * as signalR from '@microsoft/signalr';
 
 interface RealtimeMessageProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+  providerId?: string | null
 }
 
-const useRealtimeMessage = ({ setMessages }: RealtimeMessageProps) => {
-  const [connection, setConnection] = useState<HubConnection | null>(null);
+const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) => {
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   useInitSignalR({ setConnection, hubConnection: websocket.chatWebsocket });
 
   useEffect(() => {
-    if (!connection) return;
 
-    // Start SignalR connection
-    connection.start().catch((err) => console.error('SignalR connection error:', err));
+    const startConnection = async () => {
+      if (!connection) return;
 
-    // Subscribe to ReceiveMessage event
-    connection.on('ReceiveMessage', (strMessage) => {
-      // Handle incoming message
-      const message: Message = JSON.parse(strMessage);
+      try {
+        // Start SignalR connection
+        await connection.start();
 
-      setMessages((prevMessages) => {
-        if (prevMessages.some((item) => item.created_timestamp === message.created_timestamp)) {
-          return prevMessages;
-        }
-        return [...prevMessages, message];
-      });
-    });
+        // Add the user to a group (you might want to customize the group name)
+        await connection.invoke("AddToProvider", providerId);
+
+        // Subscribe to ReceiveMessage event
+        connection.on('ReceiveMessageFromProvider', (strMessage) => {
+          // Handle incoming message
+          const message: Message = JSON.parse(strMessage);
+          console.log(message);
+          setMessages((prevMessages) => {
+
+            if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) || 
+                (item.user_channel_id !== message.user_channel_id))) {
+              return prevMessages;
+            }
+            return [...prevMessages, message];
+          });
+        });
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    startConnection();
 
     return () => {
       // Stop SignalR connection when component unmounts
-      connection.stop();
+      if (connection?.state === signalR.HubConnectionState.Connected) {
+        connection.stop();
+      }
     };
     // eslint-disable-next-line
   }, [connection]);
@@ -57,7 +74,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   const [newMessage, setNewMessage] = useState<string>('');
   const [userProfile, setUserProfile] = useState<User | null>(null);
 
-  useRealtimeMessage({ setMessages });
+  useRealtimeMessage({ setMessages, providerId: myProfile?.provider_id });
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {
