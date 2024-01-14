@@ -51,7 +51,7 @@ namespace OmniChat.Services
                 // Set 'is_read' to false for the target user
                 foreach (var relatedUser in userChannel.RelatedUsers)
                 {
-                    if (relatedUser.UserId == request.To.UserId)
+                    if (relatedUser.UserId == request.From.RefId)
                     {
                         relatedUser.IsRead = false;
                     }

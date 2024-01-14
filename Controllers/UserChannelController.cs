@@ -36,6 +36,8 @@ namespace OmniChat.Controllers
         [Route("channel/message/read")]
         public async Task<ActionResult> ReadMessageAsync([FromBody] UserChannelRequest request)
         {
+            var providerId = HttpContext!.User!.FindFirst("provider_id")!.Value;
+            request.ProviderId=providerId;
             return StatusCode(StatusCodes.Status200OK, await _userChannelService.ReadMessageAsync(request));
         }
     }

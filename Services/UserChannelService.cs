@@ -1,5 +1,8 @@
 using System.Data;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using OmniChat.Handlers;
+using OmniChat.Hubs;
 using OmniChat.Interfaces;
 using OmniChat.Models;
 
@@ -9,10 +12,12 @@ namespace OmniChat.Services
     {
         private readonly IUserChannelRepository _userChannelRepo;
         private readonly IUserFriendRepository _userFriendRepo;
-        public UserChannelService(IUserChannelRepository userChannelRepo, IUserFriendRepository userFriendRepo)
+        private readonly IHubContext<ChatHub> _chatHubContext;
+        public UserChannelService(IUserChannelRepository userChannelRepo, IUserFriendRepository userFriendRepo, IHubContext<ChatHub> chatHubContext)
         {
             _userChannelRepo = userChannelRepo;
             _userFriendRepo = userFriendRepo;
+            _chatHubContext = chatHubContext;
         }
         public async Task<OkResponse<string>> AddFriendAsync(UserChannelRequest request)
         {
@@ -128,15 +133,22 @@ namespace OmniChat.Services
 
             throw new NotImplementedException($"by={request.By} is not implemented");
         }
-    
+
         public async Task<OkResponse<string>> ReadMessageAsync(UserChannelRequest request)
         {
             UserChannelHandler.HandleReadMessage(request);
 
             await _userChannelRepo.ReadMessageAsync(request);
 
-            return new OkResponse<string>{
-                Message=$"Message read!"
+            UserChannel userChannel = await _userChannelRepo
+                .FindByIdAsync(request.UserChannelId!);
+
+            await _chatHubContext.Clients.Group(userChannel.ProviderId)
+                .SendAsync("ReceiveUserChannelFromProvider", JsonConvert.SerializeObject(userChannel));
+            
+            return new OkResponse<string>
+            {
+                Message = $"Message read!"
             };
         }
     }

@@ -24,5 +24,11 @@ namespace OmniChat.Hubs
             // Broadcast the message to all clients
             await Clients.Group(message.ProviderId).SendAsync("ReceiveMessageFromProvider", message);
         }
+        public async Task SendUserChannelToProvider(UserChannel UserChannel)
+        {
+            // ... (existing code for sending UserChannels)
+            // Broadcast the UserChannel to all clients
+            await Clients.Group(UserChannel.ProviderId).SendAsync("ReceiveUserChannelFromProvider", UserChannel);
+        }
     }
 }

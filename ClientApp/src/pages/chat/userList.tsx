@@ -4,6 +4,62 @@ import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useUserChannel } from '../../shared/customHooks';
 import { useGetUserChannels } from './useChat';
 import { RequestParam } from '../../shared/contants';
+import * as signalR from '@microsoft/signalr';
+import { useChatContext } from './chat';
+
+interface RealtimeMessageProps {
+    setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>
+}
+
+const useRealtimeUserChannels = ({ setUserChannels }: RealtimeMessageProps) => {
+    const { connection } = useChatContext();
+
+    useEffect(() => {
+
+        const startConnection = async () => {
+            if (!connection) return;
+            // Stop SignalR connection when component unmounts
+            if (connection?.state !== signalR.HubConnectionState.Connected) {
+                // Start SignalR connection
+                await connection.start();
+                console.log('UserChannel: Connecting...')
+            }
+            try {
+                // Add the user to a group (you might want to customize the group name)
+                await connection.invoke("AddToProvider");
+
+                // Subscribe to ReceiveMessage event
+                connection.on('ReceiveUserChannelFromProvider', (strUserChannel) => {
+                    // Handle incoming message
+                    const userChannel: UserChannel = JSON.parse(strUserChannel);
+                    setUserChannels((prevUserChannels) => {
+
+                        if (prevUserChannels.some((item) => (item._id === userChannel._id))) {
+                            prevUserChannels = prevUserChannels.filter(i => i._id !== userChannel._id);
+                            prevUserChannels.push(userChannel);
+                            return prevUserChannels;
+                        }
+                        return prevUserChannels;
+                    });
+                });
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        startConnection();
+
+        return () => {
+            // Stop SignalR connection when component unmounts
+            if (connection?.state === signalR.HubConnectionState.Connected) {
+                // Remove the user from the group
+                connection.invoke("RemoveFromProvider");
+                connection.stop();
+            }
+        };
+        // eslint-disable-next-line
+    }, [connection]);
+}
 
 // Component for rendering individual user buttons
 interface UserButtonProps {
@@ -54,6 +110,8 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
 
     // Custom hook for fetching user channels
     useGetUserChannels({ setUserChannels, queryBy: RequestParam.friend });
+
+    useRealtimeUserChannels({ setUserChannels });
 
     // Function to select a user channel and update the URL
     const selectUserChannel = (userChannel: UserChannel): void => {

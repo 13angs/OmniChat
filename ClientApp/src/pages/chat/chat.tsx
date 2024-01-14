@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, KeyboardEvent, useMemo, useEffect } from 'react';
+import React, { useState, ChangeEvent, KeyboardEvent, useMemo, useEffect, createContext, useContext, ReactNode } from 'react';
 import { Message, MessageRequest, MessageResponse, OkResponse, User, UserChannelRequest, UserRequest } from '../../shared/types';
 import { useGetMessages, useGetUserProfile } from './useChat';
 import UserList from './userList';
@@ -13,22 +13,24 @@ import moment from 'moment'
 
 interface RealtimeMessageProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+  setLatestMessage: React.Dispatch<React.SetStateAction<Message | null>>
 }
 
-const useRealtimeMessage = ({ setMessages }: RealtimeMessageProps) => {
-  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
-
-  useInitSignalR({ setConnection, hubConnection: websocket.chatWebsocket });
+const useRealtimeMessage = ({ setMessages, setLatestMessage }: RealtimeMessageProps) => {
+  const { connection } = useChatContext();
 
   useEffect(() => {
 
     const startConnection = async () => {
       if (!connection) return;
-
-      try {
+      // Stop SignalR connection when component unmounts
+      if (connection?.state !== signalR.HubConnectionState.Connected) {
         // Start SignalR connection
         await connection.start();
+        console.log('Message: Connecting...')
+    }
 
+      try {
         // Add the user to a group (you might want to customize the group name)
         await connection.invoke("AddToProvider");
 
@@ -42,6 +44,8 @@ const useRealtimeMessage = ({ setMessages }: RealtimeMessageProps) => {
               (item.user_channel_id !== message.user_channel_id))) {
               return prevMessages;
             }
+
+            setLatestMessage(message);
             return [...prevMessages, message];
           });
         });
@@ -72,10 +76,11 @@ interface UserChatProps {
 const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   const { myProfile } = useMainContainerContext();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [latestMessage, setLatestMessage] = useState<Message | null>(null);
   const [newMessage, setNewMessage] = useState<string>('');
   const [userProfile, setUserProfile] = useState<User | null>(null);
 
-  useRealtimeMessage({ setMessages });
+  useRealtimeMessage({ setMessages, setLatestMessage });
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {
@@ -101,13 +106,13 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   // handle read message
   useEffect(() => {
     const readMessageRequest: UserChannelRequest = {
-        user_channel_id: userChannelRequest?.user_channel_id,
-        to: {
-            user_id: userChannelRequest?.to?.user_id
-        }
+      user_channel_id: latestMessage ? latestMessage?.user_channel_id : userChannelRequest?.user_channel_id,
+      to: {
+        user_id: userChannelRequest?.to?.user_id
+      }
     }
-    api.readMessage(() => { }, (err) => { alert(err) }, readMessageRequest)
-}, [userChannelRequest?.to?.user_id, userChannelRequest?.user_channel_id])
+    api.readMessage(() => { console.log('message read')}, (err) => { alert(err) }, readMessageRequest)
+  }, [latestMessage, latestMessage?.user_channel_id, userChannelRequest?.to?.user_id, userChannelRequest?.user_channel_id])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
@@ -200,14 +205,48 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   );
 };
 
+interface ChatContextProps {
+  connection: signalR.HubConnection | null;
+}
+
+const ChatContext = createContext<ChatContextProps | undefined>(undefined);
+
+export const useChatContext = (): ChatContextProps => {
+  const context = useContext(ChatContext);
+  if (!context) {
+    throw new Error('useChatContext must be used within a ChatContext');
+  }
+  return context;
+};
+
+interface ChatContextProviderProps {
+  children: ReactNode;
+}
+
+const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) => {
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+
+  useInitSignalR({ setConnection, hubConnection: websocket.chatWebsocket });
+
+  const obj = useMemo(() => ({ connection }), [connection])
+  return (
+    <ChatContext.Provider value={obj}>
+      {/* Your main content goes here */}
+      {children}
+    </ChatContext.Provider>
+  );
+};
+
 const ChatPage: React.FC = () => {
   const [userChannelRequest, setUserChannelRequest] = useState<UserChannelRequest | null>(null);
 
   return (
-    <div className="flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]">
-      <UserList setParam={setUserChannelRequest}/>
-      {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest}/>}
-    </div>
+    <ChatContextProvider>
+      <div className="flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]">
+        <UserList setParam={setUserChannelRequest} />
+        {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest} />}
+      </div>
+    </ChatContextProvider>
   );
 };
 

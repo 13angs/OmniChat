@@ -65,6 +65,13 @@ namespace OmniChat.Repositories
             return await _userChannelsCollection.UpdateOneAsync(filter, update);
         }
 
+        public async Task<UserChannel> FindByIdAsync(string userChannelId)
+        {
+            return await _userChannelsCollection
+                .Find(x=>x.Id==userChannelId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task ReplaceRelatedUsersAsync(UserChannel userChannel)
         {
             userChannel.ModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();

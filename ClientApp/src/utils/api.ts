@@ -1,7 +1,18 @@
-import { RequestParam } from "../shared/contants";
+import { RequestParam, contants } from "../shared/contants";
 import axios from 'axios';
+import Cookies from "js-cookie";
 import { AuthResponse, LoginRequest, Message, MessageRequest, MessageResponse, OkResponse, UserChannelRequest, UserChannelResponse, UserRequest, UserResponse } from "../shared/types";
 
+const getJwtToken = () => {
+    const token = Cookies.get(contants.TOKEN_COOKIE_KEY);
+    return `Bearer ${token}`;
+}
+
+const authorizedAxios = axios.create({
+    headers: {
+        Authorization: getJwtToken()
+    }
+})
 // fetch users from the server
 async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelResponse>) => void, onError: (error: any) => void, userChannelRequest: UserChannelRequest) {
     try {
@@ -11,7 +22,7 @@ async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelR
             endpoint = `api/v1/user/channels?by=${userChannelRequest.by}&provider_id=${userChannelRequest.provider_id}&from.ref_id=${userChannelRequest.from?.ref_id}`;
         }
         // Fetch users from the 'api/chat/users' endpoint
-        const response = await axios.get(endpoint);
+        const response = await authorizedAxios.get(endpoint);
         // Call the onSuccess callback with the retrieved user data
 
         if (response.status !== 200) {
@@ -28,7 +39,7 @@ async function getUserChannels(onSuccess: (userChannels: OkResponse<UserChannelR
 async function getMessages(onSuccess: (messages: OkResponse<MessageResponse>) => void, onError: (error: any) => void, params: Message) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.get(`api/v1/messages?by=user&provider_id=${params?.provider_id}&from.ref_id=${params?.from?.ref_id}&to.user_id=${params?.to?.user_id}`);
+        const response = await authorizedAxios.get(`api/v1/messages?by=user&provider_id=${params?.provider_id}&from.ref_id=${params?.from?.ref_id}&to.user_id=${params?.to?.user_id}`);
         // Call the onSuccess callback with the retrieved message data
         onSuccess(response.data);
 
@@ -42,7 +53,7 @@ async function getMessages(onSuccess: (messages: OkResponse<MessageResponse>) =>
 async function sendMessage(onSuccess: (messageResponse: OkResponse<MessageResponse>) => void, onError: (error: any) => void, body: MessageRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.post('api/v1/message/send', body, {
+        const response = await authorizedAxios.post('api/v1/message/send', body, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -66,7 +77,7 @@ async function login(onSuccess: (authResponse: OkResponse<AuthResponse>) => void
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
         console.log(body)
-        const response = await axios.post(`api/v1/auth/login`, body, {
+        const response = await authorizedAxios.post(`api/v1/auth/login`, body, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +100,7 @@ async function login(onSuccess: (authResponse: OkResponse<AuthResponse>) => void
 async function getMyProfile(onSuccess: (userResponse: OkResponse<UserResponse>) => void, onError: (error: any) => void, body: UserRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.post(`api/v1/user/me`, body, {
+        const response = await authorizedAxios.post(`api/v1/user/me`, body, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -112,7 +123,7 @@ async function getMyProfile(onSuccess: (userResponse: OkResponse<UserResponse>) 
 async function getUserFriends(onSuccess: (userFriends: OkResponse<UserResponse>) => void, onError: (error: any) => void, userRequest: UserRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.get(`api/v1/users?by=friend&provider_id=${userRequest.provider_id}&user_id=${userRequest.user_id}&current_status=${userRequest.current_status}`);
+        const response = await authorizedAxios.get(`api/v1/users?by=friend&provider_id=${userRequest.provider_id}&user_id=${userRequest.user_id}&current_status=${userRequest.current_status}`);
 
         if (response.status !== 200) {
             throw new Error(response.data.message)
@@ -131,7 +142,7 @@ async function getUserFriends(onSuccess: (userFriends: OkResponse<UserResponse>)
 async function addFriend(onSuccess: (userFriend: OkResponse<string>) => void, onError: (error: any) => void, body: UserRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.post(`api/v1/user/channel/friend/add`, body, {
+        const response = await authorizedAxios.post(`api/v1/user/channel/friend/add`, body, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -157,7 +168,7 @@ async function addFriend(onSuccess: (userFriend: OkResponse<string>) => void, on
 async function getUserProfile(onSuccess: (userResponse: OkResponse<UserResponse>) => void, onError: (error: any) => void, userRequest: UserRequest | null) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.get(`api/v1/user/profile?user_id=${userRequest?.user_id}`);
+        const response = await authorizedAxios.get(`api/v1/user/profile?user_id=${userRequest?.user_id}`);
 
         if (response.status !== 200) {
             throw new Error(response.data.message)
@@ -176,7 +187,7 @@ async function getUserProfile(onSuccess: (userResponse: OkResponse<UserResponse>
 async function readMessage(onSuccess: (userChannelResponse: OkResponse<string>) => void, onError: (error: any) => void, body: UserChannelRequest) {
     try {
         // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
-        const response = await axios.post(`api/v1/user/channel/message/read`, body, {
+        const response = await authorizedAxios.post(`api/v1/user/channel/message/read`, body, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
