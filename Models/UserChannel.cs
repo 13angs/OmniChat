@@ -89,6 +89,10 @@ namespace OmniChat.Models
 
     public class UserChannelRequest : DefaultRequest
     {
+        [BsonElement("user_channel_id")]
+        [JsonProperty("user_channel_id")]
+        public string? UserChannelId { get; set; }
+        
         [BsonElement("platform")]
         [JsonProperty("platform")]
         public required Platform Platform { get; set; }

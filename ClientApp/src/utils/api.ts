@@ -172,6 +172,32 @@ async function getUserProfile(onSuccess: (userResponse: OkResponse<UserResponse>
     }
 }
 
+// fetch messages for a specific user from the server
+async function readMessage(onSuccess: (userChannelResponse: OkResponse<string>) => void, onError: (error: any) => void, body: UserChannelRequest) {
+    try {
+        // Fetch messages from the 'api/chat/messages' endpoint with the specified user_id parameter
+        const response = await axios.post(`api/v1/user/channel/message/read`, body, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        // console.log(response.status)
+
+
+        if (response.status !== 200) {
+            throw new Error(response.data.message)
+        }
+
+        // Call the onSuccess callback with the retrieved message data
+        onSuccess(response.data);
+
+    } catch (error: any) {
+        // Call the onError callback in case of an error during message data retrieval
+        onError(error);
+    }
+}
+
 // Object containing utility functions for interacting with the server API
 const api = {
     getUserChannels,
@@ -181,7 +207,8 @@ const api = {
     getMyProfile,
     getUserFriends,
     addFriend,
-    getUserProfile
+    getUserProfile,
+    readMessage
 }
 
 export default api;

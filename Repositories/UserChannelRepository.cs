@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using OmniChat.Configurations;
 using OmniChat.Interfaces;
 using OmniChat.Models;
@@ -50,6 +51,18 @@ namespace OmniChat.Repositories
         public async Task InsertOneAsync(UserChannel userChannel)
         {
             await _userChannelsCollection.InsertOneAsync(userChannel);
+        }
+
+        public async Task<UpdateResult> ReadMessageAsync(UserChannelRequest request)
+        {
+            var builder = Builders<UserChannel>.Filter;
+            var filter = builder.And(
+                builder.Eq(x=>x.Id, request.UserChannelId),
+                builder.ElemMatch(x=>x.RelatedUsers, u=>u.UserId==request.To.UserId)
+            );
+
+            var update = Builders<UserChannel>.Update.Set(x=>x.RelatedUsers.FirstMatchingElement().IsRead, true);
+            return await _userChannelsCollection.UpdateOneAsync(filter, update);
         }
 
         public async Task ReplaceRelatedUsersAsync(UserChannel userChannel)

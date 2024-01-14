@@ -128,5 +128,16 @@ namespace OmniChat.Services
 
             throw new NotImplementedException($"by={request.By} is not implemented");
         }
+    
+        public async Task<OkResponse<string>> ReadMessageAsync(UserChannelRequest request)
+        {
+            UserChannelHandler.HandleReadMessage(request);
+
+            await _userChannelRepo.ReadMessageAsync(request);
+
+            return new OkResponse<string>{
+                Message=$"Message read!"
+            };
+        }
     }
 }

@@ -29,7 +29,7 @@ const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClic
             <div className='flex justify-center items-center'>
                 <p className='flex-grow'>{friendProps?.name}</p>
 
-                {friendProps?.is_read && (
+                {friendProps?.is_read === false && (
                     <div className='w-2 h-2 bg-green-500 rounded-xl' />
                 )}
             </div>
@@ -63,9 +63,11 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
         const url = new URL(window.location.href);
         url.searchParams.set('to.user_id', relUser?.user_id ?? "");
         url.searchParams.set('channel_type', userChannel.channel_type ?? "");
+        url.searchParams.set('user_channel_id', userChannel._id ?? "");
         window.history.pushState({}, '', url.toString());
 
         // Set the relatedUser state
+        setRelatedUser(null);
         setRelatedUser(relUser ?? null);
     };
 
@@ -73,18 +75,20 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
     const url = new URL(window.location.href);
     const friendUserId = url.searchParams.get('to.user_id');
     const channelType = url.searchParams.get('channel_type');
+    const userChannelId = url.searchParams.get('user_channel_id');
 
     useEffect(() => {
         if (setParam) {
             setParam((prev) => ({
                 ...prev,
+                user_channel_id: userChannelId?.toString(),
                 to: {
                     user_id: friendUserId ?? ""
                 },
                 channel_type: Number(channelType)
             }));
         }
-    }, [channelType, friendUserId, setParam]);
+    }, [channelType, friendUserId, setParam, userChannelId]);
 
     // Rendering the UserList component
     return (

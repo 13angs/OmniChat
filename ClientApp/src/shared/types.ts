@@ -94,6 +94,7 @@ export interface UserRequest {
     to?: MessageTo; 
 }
 export interface UserChannelRequest {
+    user_channel_id?: string;
     by?: RequestParam;
     provider_id?: string;
     to?: MessageTo;

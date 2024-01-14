@@ -31,5 +31,12 @@ namespace OmniChat.Controllers
         {
             return StatusCode(StatusCodes.Status201Created, await _userChannelService.AddFriendAsync(request));
         }
+        
+        [HttpPost]
+        [Route("channel/message/read")]
+        public async Task<ActionResult> ReadMessageAsync([FromBody] UserChannelRequest request)
+        {
+            return StatusCode(StatusCodes.Status200OK, await _userChannelService.ReadMessageAsync(request));
+        }
     }
 }

@@ -29,5 +29,16 @@ namespace OmniChat.Handlers
 
             throw new NotImplementedException($"Action not implemented");
         }
+        public static bool HandleReadMessage(UserChannelRequest request)
+        {
+            if (RequiredPropsHandler.HandleRequiredProps("user_channel_id", request.UserChannelId) &&
+                request.To != null &&
+                RequiredPropsHandler.HandleRequiredProps("to.user_id", request.To.UserId))
+            {
+                return true;
+            }
+
+            throw new NotImplementedException($"Action not implemented");
+        }
     }
 }

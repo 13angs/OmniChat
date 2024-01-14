@@ -13,10 +13,9 @@ import moment from 'moment'
 
 interface RealtimeMessageProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
-  providerId?: string | null
 }
 
-const useRealtimeMessage = ({ setMessages, providerId }: RealtimeMessageProps) => {
+const useRealtimeMessage = ({ setMessages }: RealtimeMessageProps) => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   useInitSignalR({ setConnection, hubConnection: websocket.chatWebsocket });
@@ -76,7 +75,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
   const [newMessage, setNewMessage] = useState<string>('');
   const [userProfile, setUserProfile] = useState<User | null>(null);
 
-  useRealtimeMessage({ setMessages, providerId: myProfile?.provider_id });
+  useRealtimeMessage({ setMessages });
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {
@@ -98,6 +97,17 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
 
   useGetUserProfile({ setUserProfile, userRequest });
   useGetMessages({ setMessages, messageRequest });
+
+  // handle read message
+  useEffect(() => {
+    const readMessageRequest: UserChannelRequest = {
+        user_channel_id: userChannelRequest?.user_channel_id,
+        to: {
+            user_id: userChannelRequest?.to?.user_id
+        }
+    }
+    api.readMessage(() => { }, (err) => { alert(err) }, readMessageRequest)
+}, [userChannelRequest?.to?.user_id, userChannelRequest?.user_channel_id])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
@@ -192,10 +202,11 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
 
 const ChatPage: React.FC = () => {
   const [userChannelRequest, setUserChannelRequest] = useState<UserChannelRequest | null>(null);
+
   return (
     <div className="flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]">
-      <UserList setParam={setUserChannelRequest} />
-      {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest} />}
+      <UserList setParam={setUserChannelRequest}/>
+      {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest}/>}
     </div>
   );
 };
