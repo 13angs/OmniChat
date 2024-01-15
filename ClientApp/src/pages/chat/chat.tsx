@@ -55,7 +55,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest, messages, setMe
         user_id: userChannelRequest?.to?.user_id
       }
     }
-    api.readMessage(() => { console.log('message read') }, (err) => { alert(err) }, readMessageRequest)
+    api.readMessage(() => { }, (err) => { alert(err) }, readMessageRequest)
   }, [latestMessage, latestMessage?.user_channel_id, userChannelRequest?.to?.user_id, userChannelRequest?.user_channel_id])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {

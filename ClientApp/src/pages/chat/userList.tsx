@@ -25,7 +25,7 @@ const useRealtimeUserChannels = ({ setUserChannels, setMessages, setLatestMessag
             if (connection?.state !== signalR.HubConnectionState.Connected) {
                 // Start SignalR connection
                 await connection.start();
-                console.log('UserChannel: Connecting...')
+                console.log('SignalR connected!')
             }
             try {
                 // Add the user to a group (you might want to customize the group name)

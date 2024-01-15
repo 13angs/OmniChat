@@ -16,6 +16,7 @@ function createSignalR(url: string) {
                 return token ? token.toString() : '';
             }
         })
+        .configureLogging(NODE_ENV === 'development' ? signalR.LogLevel.Information : signalR.LogLevel.None)
         .withAutomaticReconnect()
         .build();
 }
