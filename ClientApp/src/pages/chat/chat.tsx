@@ -11,76 +11,20 @@ import websocket from '../../utils/websocket';
 import * as signalR from '@microsoft/signalr';
 import moment from 'moment'
 
-interface RealtimeMessageProps {
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
-  setLatestMessage: React.Dispatch<React.SetStateAction<Message | null>>
-}
-
-const useRealtimeMessage = ({ setMessages, setLatestMessage }: RealtimeMessageProps) => {
-  const { connection } = useChatContext();
-
-  useEffect(() => {
-
-    const startConnection = async () => {
-      if (!connection) return;
-      // Stop SignalR connection when component unmounts
-      if (connection?.state !== signalR.HubConnectionState.Connected) {
-        // Start SignalR connection
-        await connection.start();
-        console.log('Message: Connecting...')
-    }
-
-      try {
-        // Add the user to a group (you might want to customize the group name)
-        await connection.invoke("AddToProvider");
-
-        // Subscribe to ReceiveMessage event
-        connection.on('ReceiveMessageFromProvider', (strMessage) => {
-          // Handle incoming message
-          const message: Message = JSON.parse(strMessage);
-          setMessages((prevMessages) => {
-
-            if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) ||
-              (item.user_channel_id !== message.user_channel_id))) {
-              return prevMessages;
-            }
-
-            setLatestMessage(message);
-            return [...prevMessages, message];
-          });
-        });
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    startConnection();
-
-    return () => {
-      // Stop SignalR connection when component unmounts
-      if (connection?.state === signalR.HubConnectionState.Connected) {
-        // Remove the user from the group
-        connection.invoke("RemoveFromProvider");
-        connection.stop();
-      }
-    };
-    // eslint-disable-next-line
-  }, [connection]);
-}
-
 interface UserChatProps {
   // userFriendId: string | null;
   userChannelRequest: UserChannelRequest | null
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+  latestMessage: Message | null
+  setLatestMessage: React.Dispatch<React.SetStateAction<Message | null>>
+  newMessage: string;
+  setNewMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
-const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
+const UserChat: React.FC<UserChatProps> = ({ userChannelRequest, messages, setMessages, latestMessage, setLatestMessage, newMessage, setNewMessage }) => {
   const { myProfile } = useMainContainerContext();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [latestMessage, setLatestMessage] = useState<Message | null>(null);
-  const [newMessage, setNewMessage] = useState<string>('');
   const [userProfile, setUserProfile] = useState<User | null>(null);
-
-  useRealtimeMessage({ setMessages, setLatestMessage });
 
   const messageRequest: MessageRequest = useMemo(() => {
     return {
@@ -111,7 +55,7 @@ const UserChat: React.FC<UserChatProps> = ({ userChannelRequest }) => {
         user_id: userChannelRequest?.to?.user_id
       }
     }
-    api.readMessage(() => { console.log('message read')}, (err) => { alert(err) }, readMessageRequest)
+    api.readMessage(() => { console.log('message read') }, (err) => { alert(err) }, readMessageRequest)
   }, [latestMessage, latestMessage?.user_channel_id, userChannelRequest?.to?.user_id, userChannelRequest?.user_channel_id])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
@@ -239,12 +183,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 const ChatPage: React.FC = () => {
   const [userChannelRequest, setUserChannelRequest] = useState<UserChannelRequest | null>(null);
+  const [latestMessage, setLatestMessage] = useState<Message | null>(null);
+  const [newMessage, setNewMessage] = useState<string>('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   return (
     <ChatContextProvider>
       <div className="flex min-h-[calc(100vh_-_100px)] max-h-[calc(100vh_-_100px)]">
-        <UserList setParam={setUserChannelRequest} />
-        {userChannelRequest?.to?.user_id && <UserChat userChannelRequest={userChannelRequest} />}
+        <UserList setParam={setUserChannelRequest} setLatestMessage={setLatestMessage} setMessages={setMessages} />
+        {userChannelRequest?.to?.user_id && (
+          <UserChat
+            userChannelRequest={userChannelRequest}
+            latestMessage={latestMessage}
+            setLatestMessage={setLatestMessage}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            messages={messages}
+            setMessages={setMessages}
+          />)}
       </div>
     </ChatContextProvider>
   );

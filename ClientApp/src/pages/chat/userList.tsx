@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RelatedUser, UserChannel, UserChannelRequest } from '../../shared/types';
+import { Message, RelatedUser, UserChannel, UserChannelRequest } from '../../shared/types';
 import { useMainContainerContext } from '../../containers/main/mainContainer';
 import { useUserChannel } from '../../shared/customHooks';
 import { useGetUserChannels } from './useChat';
@@ -9,9 +9,12 @@ import { useChatContext } from './chat';
 
 interface RealtimeMessageProps {
     setUserChannels: React.Dispatch<React.SetStateAction<UserChannel[]>>
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+    setLatestMessage: React.Dispatch<React.SetStateAction<Message | null>>
+    
 }
 
-const useRealtimeUserChannels = ({ setUserChannels }: RealtimeMessageProps) => {
+const useRealtimeUserChannels = ({ setUserChannels, setMessages, setLatestMessage }: RealtimeMessageProps) => {
     const { connection } = useChatContext();
 
     useEffect(() => {
@@ -40,6 +43,22 @@ const useRealtimeUserChannels = ({ setUserChannels }: RealtimeMessageProps) => {
                             return prevUserChannels;
                         }
                         return prevUserChannels;
+                    });
+                });
+
+                // Subscribe to ReceiveMessage event
+                connection.on('ReceiveMessageFromProvider', (strMessage) => {
+                    // Handle incoming message
+                    const message: Message = JSON.parse(strMessage);
+                    setMessages((prevMessages) => {
+
+                        if (prevMessages.some((item) => (item.created_timestamp === message.created_timestamp) ||
+                            (item.user_channel_id !== message.user_channel_id))) {
+                            return prevMessages;
+                        }
+
+                        setLatestMessage(message);
+                        return [...prevMessages, message];
                     });
                 });
             } catch (err) {
@@ -96,10 +115,12 @@ const UserButton: React.FC<UserButtonProps> = ({ userChannel, isSelected, onClic
 // Main UserList component
 interface UserListProps {
     setParam?: React.Dispatch<React.SetStateAction<UserChannelRequest | null>>;
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+    setLatestMessage: React.Dispatch<React.SetStateAction<Message | null>>
 }
 
 // UserList component for rendering the list of user channels and selecting a user channel
-const UserList: React.FC<UserListProps> = ({ setParam }) => {
+const UserList: React.FC<UserListProps> = ({ setParam, setMessages, setLatestMessage }) => {
     // State for managing user channels and selected user channel
     const [userChannels, setUserChannels] = useState<UserChannel[]>([]);
     const [relatedUser, setRelatedUser] = useState<RelatedUser | null>(null);
@@ -111,7 +132,7 @@ const UserList: React.FC<UserListProps> = ({ setParam }) => {
     // Custom hook for fetching user channels
     useGetUserChannels({ setUserChannels, queryBy: RequestParam.friend });
 
-    useRealtimeUserChannels({ setUserChannels });
+    useRealtimeUserChannels({ setUserChannels, setMessages, setLatestMessage });
 
     // Function to select a user channel and update the URL
     const selectUserChannel = (userChannel: UserChannel): void => {
