@@ -40,6 +40,7 @@ const useRealtimeUserChannels = ({ setUserChannels, setMessages, setLatestMessag
                         if (prevUserChannels.some((item) => (item._id === userChannel._id))) {
                             prevUserChannels = prevUserChannels.filter(i => i._id !== userChannel._id);
                             prevUserChannels.push(userChannel);
+                            prevUserChannels.sort((a,b)=> b.modified_timestamp - a.modified_timestamp)
                             return prevUserChannels;
                         }
                         return prevUserChannels;

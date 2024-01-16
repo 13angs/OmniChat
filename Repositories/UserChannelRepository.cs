@@ -4,6 +4,7 @@ using MongoDB.Driver.Linq;
 using OmniChat.Configurations;
 using OmniChat.Interfaces;
 using OmniChat.Models;
+using OmniChat.Services;
 
 namespace OmniChat.Repositories
 {
@@ -16,23 +17,29 @@ namespace OmniChat.Repositories
             _userChannelsCollection = database.GetCollection<UserChannel>(mongoConfig.Value.Collections!.UserChannelCols);
         }
 
-        public async Task<List<UserChannel>> FindByProviderIdAsync(string providerId)
+        public async Task<List<UserChannel>> FindByProviderIdAsync(UserChannelRequest request)
         {
+            var combinedSortDefinition = SortingService.Sort<UserChannel>(request.SortBy!, request.SortOrder!);
             return await _userChannelsCollection
-                .Find(u => u.ProviderId == providerId)
+                .Find(u => u.ProviderId == request.ProviderId)
+                .Sort(combinedSortDefinition)
+                .Limit(request.Limit)
                 .ToListAsync();
         }
 
-        public async Task<List<UserChannel>> FindByUserAsync(string providerId, string userId)
+        public async Task<List<UserChannel>> FindByUserAsync(UserChannelRequest request)
         {
             var builder = Builders<UserChannel>.Filter;
+            var combinedSortDefinition = SortingService.Sort<UserChannel>(request.SortBy!, request.SortOrder!);
             var filter = builder.And(
-                builder.Eq(x => x.ProviderId, providerId),
-                builder.ElemMatch(x => x.RelatedUsers, u => u.UserId == userId)
+                builder.Eq(x => x.ProviderId, request.ProviderId),
+                builder.ElemMatch(x => x.RelatedUsers, u => u.UserId == request.From.RefId)
             );
 
             return await _userChannelsCollection
                 .Find(filter)
+                .Sort(combinedSortDefinition)
+                .Limit(request.Limit)
                 .ToListAsync();
         }
 

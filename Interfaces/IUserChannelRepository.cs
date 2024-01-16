@@ -7,9 +7,9 @@ namespace OmniChat.Interfaces
     {
         public Task<UserChannel> FindRelatedUsersAsync(string from, string to);
         public Task InsertOneAsync(UserChannel userChannel);
-        public Task<List<UserChannel>> FindByProviderIdAsync(string providerId);
+        public Task<List<UserChannel>> FindByProviderIdAsync(UserChannelRequest request);
         public Task ReplaceRelatedUsersAsync(UserChannel userChannel);
-        public Task<List<UserChannel>> FindByUserAsync(string providerId, string userId);
+        public Task<List<UserChannel>> FindByUserAsync(UserChannelRequest request);
         public Task<UpdateResult> ReadMessageAsync(UserChannelRequest request);
         public Task<UserChannel> FindByIdAsync(string userChannelId);
     }

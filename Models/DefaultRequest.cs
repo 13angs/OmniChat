@@ -9,5 +9,11 @@ namespace OmniChat.Models
         
         [FromQuery(Name = "limit")]
         public int Limit { get; set; }
+        
+        [FromQuery(Name = "sort_by")]
+        public string[]? SortBy { get; set; }
+
+        [FromQuery(Name = "sort_order")]
+        public string[]? SortOrder { get; set; }
     }
 }

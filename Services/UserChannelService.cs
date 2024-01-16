@@ -118,7 +118,7 @@ namespace OmniChat.Services
             {
                 return new UserChannelResponse
                 {
-                    UserChannels = await _userChannelRepo.FindByProviderIdAsync(request.ProviderId)
+                    UserChannels = await _userChannelRepo.FindByProviderIdAsync(request)
                 };
             }
             // If by=friend, get all user_channels by provider_id, user_id
@@ -127,7 +127,7 @@ namespace OmniChat.Services
                 return new UserChannelResponse
                 {
                     UserChannels = await _userChannelRepo
-                        .FindByUserAsync(request.ProviderId, request.From.RefId!)
+                        .FindByUserAsync(request)
                 };
             }
 
