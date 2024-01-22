@@ -97,6 +97,7 @@ builder.Services.AddSingleton<IUserFriendRepository, UserFriendRepository>();
 builder.Services.AddSingleton<UserChannelService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<IMessageRepository, MessageRepository>();
+builder.Services.AddSingleton<PlatformService>();
 
 var app = builder.Build();
 
