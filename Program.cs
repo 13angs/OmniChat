@@ -98,6 +98,8 @@ builder.Services.AddSingleton<UserChannelService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<IMessageRepository, MessageRepository>();
 builder.Services.AddSingleton<PlatformService>();
+builder.Services.AddSingleton<ChannelRepository>();
+builder.Services.AddSingleton<ChannelService>();
 
 var app = builder.Build();
 
