@@ -17,12 +17,23 @@ namespace OmniChat.Repositories
         public async Task<Channel> FindByClientIdAsync(ChannelRequest request)
         {
             return await _channelsCollection
-                .Find(x => x.ChannelInfo.ClientId == request.ChannelInfo.ClientId)
+                .Find(x => x.ChannelInfo.ClientId == request!.ChannelInfo!.ClientId)
                 .FirstOrDefaultAsync();
         }
         public async Task InsertOneAsync(Channel channel)
         {
             await _channelsCollection.InsertOneAsync(channel);
+        }
+        public IEnumerable<Channel> FindChannels(ChannelRequest request)
+        {
+            if (request.By == RequestParam.platform)
+            {
+                return _channelsCollection
+                    .Find(x => x.ProviderId == request.ProviderId &&
+                        x.Platform == request.Platform)
+                    .ToEnumerable();
+            }
+            throw new NotImplementedException("Action not implemented");
         }
     }
 }

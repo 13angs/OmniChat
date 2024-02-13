@@ -20,5 +20,16 @@ namespace OmniChat.Handlers
 
             throw new BadHttpRequestException("Action not implemented");
         }
+        public static bool HandleGetChannelByLine(ChannelRequest request)
+        {
+            if (request.By == RequestParam.platform &&
+                request.Platform == Platform.line &&
+                RequiredPropsHandler.HandleRequiredProps("provider_id", request.ProviderId))
+            {
+                return true;
+            }
+
+            throw new BadHttpRequestException("Action not implemented");
+        }
     }
 }

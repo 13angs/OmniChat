@@ -35,13 +35,14 @@ namespace OmniChat.Services
                 ChannelInfo = request.ChannelInfo
             };
 
-            channel.ChannelInfo.Line = new LineChannelInfo{
-                UserId=lineChannelInfo.UserId!,
-                BasicId=lineChannelInfo.BasicId!,
-                DisplayName=lineChannelInfo.DisplayName!,
-                PictureUrl=lineChannelInfo.PictureUrl!,
-                ChatMode=lineChannelInfo.ChatMode!,
-                MarkAsReadMode=lineChannelInfo.MarkAsReadMode!,
+            channel.ChannelInfo.Line = new LineChannelInfo
+            {
+                UserId = lineChannelInfo.UserId!,
+                BasicId = lineChannelInfo.BasicId!,
+                DisplayName = lineChannelInfo.DisplayName!,
+                PictureUrl = lineChannelInfo.PictureUrl!,
+                ChatMode = lineChannelInfo.ChatMode!,
+                MarkAsReadMode = lineChannelInfo.MarkAsReadMode!,
             };
 
             await _channelRepo.InsertOneAsync(channel);
@@ -52,6 +53,21 @@ namespace OmniChat.Services
             return new OkResponse<string>
             {
                 Message = fullUrl
+            };
+        }
+
+        public OkResponse<ChannelResponse> GetChannels(ChannelRequest request)
+        {
+            ChannelHandler.HandleGetChannelByLine(request);
+
+            IEnumerable<Channel> channels = _channelRepo.FindChannels(request);
+
+            return new OkResponse<ChannelResponse>
+            {
+                Data = new ChannelResponse
+                {
+                    Channels = channels.ToList()
+                }
             };
         }
     }

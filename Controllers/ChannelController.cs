@@ -26,5 +26,12 @@ namespace OmniChat.Controllers
 
             return StatusCode(StatusCodes.Status201Created, await _channelService.CreateChannelAsync(request, baseUrl));
         }
+
+        [HttpGet]
+        [Route("channels")]
+        public ActionResult GetChannels([FromQuery] ChannelRequest request)
+        {
+            return StatusCode(StatusCodes.Status200OK, _channelService.GetChannels(request));
+        }
     }
 }
